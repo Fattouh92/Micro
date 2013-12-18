@@ -39,7 +39,7 @@ public class TomasuloAlg {
 		this.addiCyc = addiCyc;
 	}
 	
-	public void start(ArrayList<Register> regs, String[] ins){
-	
+	public void start(ArrayList<Register> regs){
+		
 	}
 }
