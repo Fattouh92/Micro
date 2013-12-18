@@ -14,12 +14,19 @@ public class Cache {
 	int cycles_access_data2;
 	int cycles_access_data3;
 	int cycles_access_memory;
-	int write_hit_policy; //1=write_throught 2=write_back
-	int write_miss_policy; //1=write allocate 2=write around
-	int write_hit_policy2; //1=write_throught 2=write_back
-	int write_miss_policy2;
-	int write_hit_policy3; //1=write_throught 2=write_back
-	int write_miss_policy3;
+	int write_hit_policy;   //1=write_throught 2=write_back
+	int write_miss_policy;  //1=write allocate 2=write around
+	int write_hit_policy2;  //1=write_throught 2=write_back
+	int write_miss_policy2; //1=write allocate 2=write around
+	int write_hit_policy3;  //1=write_throught 2=write_back
+	int write_miss_policy3; //1=write allocate 2=write around
+	int hit=0;
+	int miss=0;
+	int hit2=0;
+	int miss2=0;
+	int hit3=0;
+	int miss3=0;
+	public static int cycles = 0;
 	int levels;
 	int index;
 	int tag;
@@ -30,6 +37,7 @@ public class Cache {
 	int index3;
 	int tag3;
 	int offset3;
+	int pc;
 	ArrayList<ActualCache> LevelOne = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelTwo = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelThree = new ArrayList<ActualCache>();
@@ -43,8 +51,8 @@ public class Cache {
 			int write_hit_policy2, int write_miss_policy2,int write_hit_policy3, 
 			int write_miss_policy3, int levels, int index,
 			int tag, int offset, int index2, int tag2, int offset2, int index3,
-			int tag3, int offset3, Memory memory) {
-		super();
+			int tag3, int offset3, Memory memory, int pc) {
+		this.pc = pc;
 		S = s;
 		L = l;
 		this.m = m;
@@ -92,6 +100,7 @@ public class Cache {
 	}
 	
 	public void read (String address) {
+		cycles += this.cycles_access_data;
 		
 		while(address.length() < 16) {
 			address = "0" + address;
@@ -111,8 +120,9 @@ public class Cache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			
+			hit++;
 		} else {
+			miss++;
 			if (levels >= 2) {
 				this.readLevelTwo(address);
 				if (tempTags.contains(null)) {
@@ -126,7 +136,7 @@ public class Cache {
 					LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
 				}
 			} else {
-				memory.readData(address);
+				memory.readData(address, cycles_access_memory);
 				if (tempTags.contains(null)) {
 					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
@@ -142,6 +152,7 @@ public class Cache {
 	}
 	
 	public void readLevelTwo (String address) {
+		cycles += this.cycles_access_data2;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -160,8 +171,9 @@ public class Cache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			
+			hit++;
 		} else {
+			miss++;
 			if (levels == 3) {
 				this.readLevelThree(address);
 				if (tempTags.contains(null)) {
@@ -175,7 +187,7 @@ public class Cache {
 					LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
 				}
 			} else {
-				memory.readData(address);
+				memory.readData(address, cycles_access_memory);
 				if (tempTags.contains(null)) {
 					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
@@ -191,6 +203,7 @@ public class Cache {
 	}
 	
 	public void readLevelThree(String address) {
+		cycles += this.cycles_access_data3;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -209,9 +222,10 @@ public class Cache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			
+			hit++;
 		} else {
-			memory.readData(address);
+			miss++;
+			memory.readData(address, cycles_access_memory);
 			if (tempTags.contains(null)) {
 				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
@@ -223,5 +237,9 @@ public class Cache {
 				LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
 			}
 		}
+	}
+	
+	public String getInstruction() {
+		return "";
 	}
 }
