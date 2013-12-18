@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Memory {
         ArrayList<String> memory = new ArrayList<String>();
-        ArrayList<String> index = new ArrayList<String>();
+        ArrayList<Integer> index = new ArrayList<Integer>();
         
         public String readData(String address){
         		if (index.contains(address)) {
@@ -13,7 +13,7 @@ public class Memory {
                 }
         }
         
-        public void writeData(String address, String data){
+        public void writeData(int address, String data){
                 index.add(address);
                 memory.add(data);
         }
