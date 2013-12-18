@@ -37,6 +37,7 @@ public class Cache {
 	int index3;
 	int tag3;
 	int offset3;
+	int pc;
 	ArrayList<ActualCache> LevelOne = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelTwo = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelThree = new ArrayList<ActualCache>();
@@ -50,8 +51,8 @@ public class Cache {
 			int write_hit_policy2, int write_miss_policy2,int write_hit_policy3, 
 			int write_miss_policy3, int levels, int index,
 			int tag, int offset, int index2, int tag2, int offset2, int index3,
-			int tag3, int offset3, Memory memory) {
-		super();
+			int tag3, int offset3, Memory memory, int pc) {
+		this.pc = pc;
 		S = s;
 		L = l;
 		this.m = m;
@@ -236,5 +237,9 @@ public class Cache {
 				LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
 			}
 		}
+	}
+	
+	public String getInstruction() {
+		return "";
 	}
 }
