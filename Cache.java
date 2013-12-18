@@ -14,12 +14,19 @@ public class Cache {
 	int cycles_access_data2;
 	int cycles_access_data3;
 	int cycles_access_memory;
-	int write_hit_policy; //1=write_throught 2=write_back
-	int write_miss_policy; //1=write allocate 2=write around
-	int write_hit_policy2; //1=write_throught 2=write_back
-	int write_miss_policy2;
-	int write_hit_policy3; //1=write_throught 2=write_back
-	int write_miss_policy3;
+	int write_hit_policy;   //1=write_throught 2=write_back
+	int write_miss_policy;  //1=write allocate 2=write around
+	int write_hit_policy2;  //1=write_throught 2=write_back
+	int write_miss_policy2; //1=write allocate 2=write around
+	int write_hit_policy3;  //1=write_throught 2=write_back
+	int write_miss_policy3; //1=write allocate 2=write around
+	int hit=0;
+	int miss=0;
+	int hit2=0;
+	int miss2=0;
+	int hit3=0;
+	int miss3=0;
+	public static int cycles = 0;
 	int levels;
 	int index;
 	int tag;
@@ -92,6 +99,7 @@ public class Cache {
 	}
 	
 	public void read (String address) {
+		cycles += this.cycles_access_data;
 		
 		while(address.length() < 16) {
 			address = "0" + address;
@@ -111,8 +119,9 @@ public class Cache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			
+			hit++;
 		} else {
+			miss++;
 			if (levels >= 2) {
 				this.readLevelTwo(address);
 				if (tempTags.contains(null)) {
@@ -126,7 +135,7 @@ public class Cache {
 					LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
 				}
 			} else {
-				memory.readData(address);
+				memory.readData(address, cycles_access_memory);
 				if (tempTags.contains(null)) {
 					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
@@ -142,6 +151,7 @@ public class Cache {
 	}
 	
 	public void readLevelTwo (String address) {
+		cycles += this.cycles_access_data2;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -160,8 +170,9 @@ public class Cache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			
+			hit++;
 		} else {
+			miss++;
 			if (levels == 3) {
 				this.readLevelThree(address);
 				if (tempTags.contains(null)) {
@@ -175,7 +186,7 @@ public class Cache {
 					LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
 				}
 			} else {
-				memory.readData(address);
+				memory.readData(address, cycles_access_memory);
 				if (tempTags.contains(null)) {
 					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
@@ -191,6 +202,7 @@ public class Cache {
 	}
 	
 	public void readLevelThree(String address) {
+		cycles += this.cycles_access_data3;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -209,9 +221,10 @@ public class Cache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			
+			hit++;
 		} else {
-			memory.readData(address);
+			miss++;
+			memory.readData(address, cycles_access_memory);
 			if (tempTags.contains(null)) {
 				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
