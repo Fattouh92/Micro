@@ -10,6 +10,7 @@ public class Cache {
 	int S3;
 	int L3;
 	int m3;
+	int memory_accesses;
 	int cycles_access_data;
 	int cycles_access_data2;
 	int cycles_access_data3;
@@ -26,7 +27,7 @@ public class Cache {
 	int miss2=0;
 	int hit3=0;
 	int miss3=0;
-	public static int cycles = 0;
+	int cycles = 0;
 	int levels;
 	int index;
 	int tag;
@@ -42,17 +43,13 @@ public class Cache {
 	ArrayList<ActualCache> LevelTwo = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelThree = new ArrayList<ActualCache>();
 	Memory memory;
-	//ArrayList<ActualCache> ICache = new ArrayList<ActualCache>();
-	
+
 	public Cache(int s, int l, int m, int s2, int l2, int m2, int s3, int l3,
 			int m3, int cycles_access_data, int cycles_access_data2,
 			int cycles_access_data3, int cycles_access_memory,
 			int write_hit_policy, int write_miss_policy, 
 			int write_hit_policy2, int write_miss_policy2,int write_hit_policy3, 
-			int write_miss_policy3, int levels, int index,
-			int tag, int offset, int index2, int tag2, int offset2, int index3,
-			int tag3, int offset3, Memory memory, int pc) {
-		this.pc = pc;
+			int write_miss_policy3, int levels, Memory memory) {
 		S = s;
 		L = l;
 		this.m = m;
@@ -78,168 +75,227 @@ public class Cache {
 		this.tag = 16 - offset - index;
 		int i;
 		for (i = 0; i<m; i++) {
-			LevelOne.add(new ActualCache(new String[S/L][3]));
+			LevelOne.add(new ActualCache(new String[S/L][4]));
 		}
 		if (2 <= levels) {
 			this.offset2 = (int)(Math.log(L2)/Math.log(2));
 			this.index2 =  (int)(Math.log(S2/L2)/Math.log(2));
 			this.tag2 = 16 - offset - index;
 			for (i = 0; i<m; i++) {
-				LevelTwo.add(new ActualCache(new String[S2/L2][3]));
+				LevelTwo.add(new ActualCache(new String[S2/L2][4]));
 			}
 			if (3 <= levels) {
 				this.offset3 = (int)(Math.log(L3)/Math.log(2));
 				this.index3 =  (int)(Math.log(S3/L3)/Math.log(2));
 				this.tag3 = 16 - offset3 - index3;
 				for (i = 0; i<m; i++) {
-					LevelThree.add(new ActualCache(new String[S3/L3][3]));
+					LevelThree.add(new ActualCache(new String[S3/L3][4]));
 				}
 			}
 		}
 		this.memory = memory;
 	}
-	
-	public void read (String address) {
+
+	public void read (String address, int type) {  //type=1 read or 2 = write
 		cycles += this.cycles_access_data;
-		
+
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
-		
+
 		String tempTag = address.substring(0, tag);
 		String tempIndex = address.substring(tag, tag+index);
 		String tempOffset = address.substring(tag+index, 16);
-		
+
 		int indexInt = Integer.parseInt(tempIndex, 2);
 		ArrayList<String> tempTags = new ArrayList<String>();
-		if (this.m == 0) {
-			
-		}
 		for(int j = 0; j < LevelOne.size(); j++) {
 			String TempTag1 = LevelOne.get(j).getArray()[indexInt][0];
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
 			hit++;
+			if(type == 2 && write_hit_policy == 1) {
+				this.memory_accesses ++;
+			}
+			if(type == 2 && write_hit_policy == 2) {
+				LevelOne.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
+			}
 		} else {
 			miss++;
 			if (levels >= 2) {
-				this.readLevelTwo(address);
-				if (tempTags.contains(null)) {
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelOne.get(random).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
+				this.readLevelTwo(address, type);
+				if (type != 2 || write_miss_policy != 2) {
+					if (tempTags.contains(null)) {
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelOne.get(random).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
+							this.memory_accesses++;
+						}
+						LevelOne.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			} else {
-				memory.readData(address, cycles_access_memory);
-				if (tempTags.contains(null)) {
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelOne.get(random).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
+				this.memory_accesses++;
+				if (type != 2 || write_miss_policy != 2) {
+					if (tempTags.contains(null)) {
+						//System.out.println("no replace");
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelOne.get(random).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
+							this.memory_accesses++;
+						}
+						LevelOne.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			}
+
 		}
+		//System.out.println(this.hit);
+		//System.out.println(this.memory_accesses);
+		
 	}
-	
-	public void readLevelTwo (String address) {
+
+	public void readLevelTwo (String address, int type) {
 		cycles += this.cycles_access_data2;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
-		
+
 		String tempTag = address.substring(0, tag2);
 		String tempIndex = address.substring(tag2, tag2+index2);
 		String tempOffset = address.substring(tag2+index2, 16);
-		
+
 		int indexInt = Integer.parseInt(tempIndex, 2);
 		ArrayList<String> tempTags = new ArrayList<String>();
-		if (this.m2 == 0) {
-			
-		}
 		for(int j = 0; j < LevelTwo.size(); j++) {
 			String TempTag1 = LevelTwo.get(j).getArray()[indexInt][0];
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			hit++;
+			hit2++;
+			if(type == 2 && write_hit_policy2 == 1) {
+				this.memory_accesses ++;
+			}
+			if(type == 2 && write_hit_policy2 == 2) {
+				LevelTwo.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
+			}
 		} else {
-			miss++;
+			miss2++;
+
 			if (levels == 3) {
-				this.readLevelThree(address);
-				if (tempTags.contains(null)) {
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
+				this.readLevelThree(address, type);
+				if (type != 2 || write_miss_policy2 != 2) {
+					if (tempTags.contains(null)) {
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
+							this.memory_accesses++;
+						}
+						LevelTwo.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			} else {
-				memory.readData(address, cycles_access_memory);
-				if (tempTags.contains(null)) {
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
+				this.memory_accesses++;
+				if (type != 2 || write_miss_policy2 != 2) {
+					if (tempTags.contains(null)) {
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
+							this.memory_accesses++;
+						}
+						LevelTwo.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			}
 		}
 	}
-	
-	public void readLevelThree(String address) {
+
+	public void readLevelThree(String address, int type) {
 		cycles += this.cycles_access_data3;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
-		
+
 		String tempTag = address.substring(0, tag3);
 		String tempIndex = address.substring(tag3, tag3+index3);
 		String tempOffset = address.substring(tag3+index3, 16);
-		
+
 		int indexInt = Integer.parseInt(tempIndex, 2);
 		ArrayList<String> tempTags = new ArrayList<String>();
-		if (this.m3 == 0) {
-			
-		}
 		for(int j = 0; j < LevelThree.size(); j++) {
 			String TempTag1 = LevelThree.get(j).getArray()[indexInt][0];
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			hit++;
+			hit3++;
+			if(type == 2 && write_hit_policy3 == 1) {
+				this.memory_accesses ++;
+			}
+			if(type == 2 && write_hit_policy3 == 2) {
+				LevelThree.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
+			}
 		} else {
-			miss++;
-			memory.readData(address, cycles_access_memory);
-			if (tempTags.contains(null)) {
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-			} else {
-				int random = (int) (Math.random() * tempTags.size()); 
-				LevelThree.get(random).getArray()[indexInt][0] = tempTag;
-				LevelThree.get(random).getArray()[indexInt][1] = tempIndex;
-				LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
+			this.memory_accesses++;
+			miss3++;
+			if (type != 2 || write_miss_policy3 != 2) {
+				if (tempTags.contains(null)) {
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+				} else {
+					int random = (int) (Math.random() * tempTags.size()); 
+					LevelThree.get(random).getArray()[indexInt][0] = tempTag;
+					LevelThree.get(random).getArray()[indexInt][1] = tempIndex;
+					LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
+					if (LevelThree.get(random).getArray()[indexInt][3].equals("Y")) {
+						this.memory_accesses++;
+					}
+					LevelThree.get(random).getArray()[indexInt][3] = "N";
+				}
 			}
 		}
 	}
-	
-	public String getInstruction() {
-		return "";
+	public static void main(String[]args) {
+		Cache c = new Cache(128, 16, 2, 0, 0, 0, 0, 0,
+				0,  3,  0,
+				 0,  100,
+				 1,  1, 
+				 0, 0,0,0, 1, new Memory());
+		c.read("10000110", 1);
+		c.read("11010100", 1);
+		c.read("10000110", 1);
+		c.read("11010100", 1);
+		//c.read("10", 1);
+		//c.read("", 1);
 	}
 }
