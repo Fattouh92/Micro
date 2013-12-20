@@ -49,10 +49,7 @@ public class Cache {
 			int cycles_access_data3, int cycles_access_memory,
 			int write_hit_policy, int write_miss_policy, 
 			int write_hit_policy2, int write_miss_policy2,int write_hit_policy3, 
-			int write_miss_policy3, int levels, int index,
-			int tag, int offset, int index2, int tag2, int offset2, int index3,
-			int tag3, int offset3, Memory memory, int pc) {
-		this.pc = pc;
+			int write_miss_policy3, int levels, Memory memory) {
 		S = s;
 		L = l;
 		this.m = m;
@@ -149,6 +146,7 @@ public class Cache {
 				this.memory_accesses++;
 				if (type != 2 || write_miss_policy != 2) {
 					if (tempTags.contains(null)) {
+						//System.out.println("no replace");
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
@@ -167,6 +165,9 @@ public class Cache {
 			}
 
 		}
+		//System.out.println(this.hit);
+		//System.out.println(this.memory_accesses);
+		
 	}
 
 	public void readLevelTwo (String address, int type) {
@@ -283,5 +284,18 @@ public class Cache {
 				}
 			}
 		}
+	}
+	public static void main(String[]args) {
+		Cache c = new Cache(128, 16, 2, 0, 0, 0, 0, 0,
+				0,  3,  0,
+				 0,  100,
+				 1,  1, 
+				 0, 0,0,0, 1, new Memory());
+		c.read("10000110", 1);
+		c.read("11010100", 1);
+		c.read("10000110", 1);
+		c.read("11010100", 1);
+		//c.read("10", 1);
+		//c.read("", 1);
 	}
 }
