@@ -46,10 +46,13 @@ public class TomasuloAlg {
 		int[] regTable = new int[regs.size()];
 		String ins = memory.readData(Integer.toBinaryString(pc));
 		iCache.read(Integer.toBinaryString(pc));
+		boolean addIns = true;
 		while (!ins.equals("")){
-			cycles++;
-			String[] insa = {ins, ""};
-			ib.enqueue(insa);
+			if (addIns){
+				cycles++;
+				String[] insa = {ins, ""};
+				ib.enqueue(insa);
+			}
 			for (int i = 0; i < ib.size(); i++){
 				cycles++;
 				
@@ -62,7 +65,7 @@ public class TomasuloAlg {
 							
 							case "load":
 						        if (!loadRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -82,7 +85,7 @@ public class TomasuloAlg {
 							
 							case "store":
 								if (!storeRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -101,7 +104,7 @@ public class TomasuloAlg {
 								break;
 							case "add":
 								if (!addRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -127,7 +130,7 @@ public class TomasuloAlg {
 							  break;
 							case "sub":
 								if (!subRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -153,7 +156,7 @@ public class TomasuloAlg {
 							  break;
 							case "nand":
 								if (!nandRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -179,7 +182,7 @@ public class TomasuloAlg {
 							  break;
 							case "mult":
 								if (!multRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -205,7 +208,7 @@ public class TomasuloAlg {
 							  break;
 							case "addi":
 								if (!addiRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -223,8 +226,47 @@ public class TomasuloAlg {
 						        }
 							  break;
 							default:
-								break;
+							  break;
 						}
+					}
+				}
+				
+				else if(ib.get(i,1).equals("issued")){
+					String op = checkOp(ib.get(i,0));
+					switch (op) {					
+						case "load":
+							int index = 0;
+							for (int k = 0; k < loadRs.size(); k++){
+								if (loadRs.get(k, 3).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (loadRs.get(index, 4).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (loadRs.get(index, 2).equals("")){
+								int rem = Integer.parseInt(loadRs.get(index, 4));
+								rem--;
+								loadRs.modify(index, 4, Integer.toString(rem));
+							}
+							else{
+								
+							}
+							break;
+						case "store":
+							break;
+						case "add":
+							break;
+						case "sub":
+							break;
+						case "nand":
+							break;
+						case "mult":
+							break;
+						case "addi":
+							break;
+						default:
+							break;
 					}
 				}
 				
@@ -232,8 +274,13 @@ public class TomasuloAlg {
 		
 			
 			if (!ib.isFull()){
+				pc++;
 				ins = memory.readData(Integer.toBinaryString(pc));
 				iCache.read(Integer.toBinaryString(pc));
+				addIns = true;
+			}
+			else{
+				addIns = false;
 			}
 		}
 	}
