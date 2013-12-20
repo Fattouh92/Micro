@@ -38,4 +38,7 @@ public class Queue {
 	public int size() {
 		return nItems;
 	}
+	public String get(int index){
+		return queArray[index];
+	}
 }
