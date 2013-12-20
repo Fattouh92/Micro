@@ -42,9 +42,10 @@ public class TomasuloAlg {
 		cycles = 0;
 	}
 	
-	public void start(ArrayList<Register> regs, Cache cache, int pc){
+	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, int pc){
 		int[] regTable = new int[regs.size()];
-		String ins = cache.getInstruction();
+		String ins = memory.readData(Integer.toBinaryString(pc));
+		iCache.read(Integer.toBinaryString(pc));
 		while (!ins.equals("")){
 			cycles++;
 			String[] insa = {ins, ""};
@@ -231,7 +232,8 @@ public class TomasuloAlg {
 		
 			
 			if (!ib.isFull()){
-				ins = cache.getInstruction();
+				ins = memory.readData(Integer.toBinaryString(pc));
+				iCache.read(Integer.toBinaryString(pc));
 			}
 		}
 	}
@@ -249,13 +251,5 @@ public class TomasuloAlg {
 	}
 	public int getRegIndex(ArrayList<Register> regs, String destReg){
 		return -1;
-	}
-	public boolean tdFull(String[][] x){
-		for(int j = 0; j < x.length; j++){
-			if (x[j][0].equals("")){
-				return false;
-			}
-		}
-		return true;
 	}
 }
