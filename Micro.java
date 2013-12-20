@@ -19,9 +19,9 @@ static String[] instructions;
                 Memory memory = new Memory();
                 Assembler assembler = new Assembler();
                 instructions = assembler.assemble(new File("src/pack/input_program.txt"));
-                for(int i=0; i<instructions.length; i=i+2){
-                	memory.writeData(startAddress,instructions[i]);
-                	startAddress++;
+                for(int i=0; i<instructions.length; i++){
+                	memory.writeData(Integer.toBinaryString(startAddress),instructions[i]);
+                	startAddress+=2;
                 }
         }
 

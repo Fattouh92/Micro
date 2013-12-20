@@ -153,7 +153,7 @@ public class Cache {
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
 					} else {
-						int random = (int) (Math.random() * tempTags.size()); 
+						int random = (int) (Math.random() * tempTags.size());
 						LevelOne.get(random).getArray()[indexInt][0] = tempTag;
 						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
 						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
