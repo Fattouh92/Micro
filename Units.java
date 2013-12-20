@@ -36,8 +36,9 @@ public class Units {
 	
 	public void Store(Memory m,Register a,Register b,int immediate){
 		int address=immediate+b.getValue();
+		String add=Integer.toString(address);
 		String value=Integer.toString(a.getValue());
-		m.writeData(address, value);
+		m.writeData(add, value);
 	}
 	
    public void BEQ(Register pc,Register a,Register b,int immediate){
