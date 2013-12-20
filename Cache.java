@@ -119,6 +119,7 @@ public class Cache {
 				this.memory_accesses ++;
 			}
 			if(type == 2 && write_hit_policy == 2) {
+				//System.out.println("here");
 				LevelOne.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
 			}
 		} else {
@@ -152,11 +153,12 @@ public class Cache {
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
 					} else {
-						int random = (int) (Math.random() * tempTags.size()); 
+						int random = (int) (Math.random() * tempTags.size());
 						LevelOne.get(random).getArray()[indexInt][0] = tempTag;
 						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
 						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
 						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
+							//System.out.println("here2");
 							this.memory_accesses++;
 						}
 						LevelOne.get(random).getArray()[indexInt][3] = "N";
@@ -286,14 +288,13 @@ public class Cache {
 		}
 	}
 	public static void main(String[]args) {
-		Cache c = new Cache(128, 16, 2, 0, 0, 0, 0, 0,
+		Cache c = new Cache(128, 16, 1, 0, 0, 0, 0, 0,
 				0,  3,  0,
 				 0,  100,
-				 1,  1, 
+				 2,  1, 
 				 0, 0,0,0, 1, new Memory());
 		c.read("10000110", 1);
-		c.read("11010100", 1);
-		c.read("10000110", 1);
+		c.read("10000110", 2);
 		c.read("11010100", 1);
 		//c.read("10", 1);
 		//c.read("", 1);

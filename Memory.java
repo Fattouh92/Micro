@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class Memory {
         ArrayList<String> memory = new ArrayList<String>();
-        ArrayList<Integer> index = new ArrayList<Integer>();
+        ArrayList<String> index = new ArrayList<String>();
         
-        public String readData(String address, int time){
+        public String readData(String address){
         		if (index.contains(address)) {
                         int i = index.indexOf(address);
                         return memory.get(i);
@@ -13,7 +13,7 @@ public class Memory {
                 }
         }
         
-        public void writeData(int address, String data){
+        public void writeData(String address, String data){
                 index.add(address);
                 memory.add(data);
         }
