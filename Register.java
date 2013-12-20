@@ -1,16 +1,27 @@
-import java.util.ArrayList;
-
 
 public class Register {
-    ArrayList<Integer> registers= new ArrayList<Integer>();
+	private String name;
+	private int value;
 
-	public int getValue(int index) {
-		return registers.get(index);
+	public Register(int value) {
+		this.value = value;
 	}
 
-	public void setValue(int value, int index) {
-		registers.add(index, value);
+	public Register(String name, int value) {
+		this.name = name;
+		this.value = value;
 	}
+
+	public int getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		if (name.equals("zero"))
+			return;
+		this.value = value;
+	}
+	
 
 }
 
