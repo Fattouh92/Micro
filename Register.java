@@ -21,7 +21,6 @@ public class Register {
 			return;
 		this.value = value;
 	}
-	
 
 }
 
