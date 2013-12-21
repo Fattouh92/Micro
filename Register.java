@@ -1,7 +1,7 @@
 
 public class Register {
-	private String name;
-	private int value;
+	String name;
+	int value;
 
 	public Register(int value) {
 		this.value = value;

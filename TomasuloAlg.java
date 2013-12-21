@@ -44,6 +44,9 @@ public class TomasuloAlg {
 	
 	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, Register pc){
 		int[] regTable = new int[regs.size()];
+		for (int tempCounter=0; tempCounter < regTable.length; tempCounter++) {
+			regTable[tempCounter] = -1;
+		}
 		String ins = memory.readData(Integer.toBinaryString(pc.getValue()));
 		iCache.read(Integer.toBinaryString(pc.getValue()));
 		boolean addIns = true;
@@ -435,17 +438,34 @@ public class TomasuloAlg {
 	}
 	
 	public String checkOp(String ins){
-		return "";
+		return ins.split(" ")[0];
 	}
 	public String[] getRegs(String op, String ins){
 		String[] s = new String[3];
-		//[dest reg, reg1, reg2//offset]
+		String[] split = ins.split(" ");
+		s[0] = split[1];
+		s[1] = split[2];
+		s[3] = split[3];
 		return s;
 	}
 	public boolean freeDest(ArrayList<Register> regs, int[] regTable, String destReg){
+		int access = this.getRegIndex(regs, destReg);
+		if (access == -1){
+			return false;
+		}
+		if (regTable[access] == -1) {
+			return true;
+		}
 		return false;
 	}
+	
 	public int getRegIndex(ArrayList<Register> regs, String destReg){
+		for(int tempI =0; tempI<regs.size(); tempI++) {
+			String tempR = regs.get(tempI).name;
+			if (tempR.equals(destReg)) {
+				return tempI;
+			}
+		}
 		return -1;
 	}
 }

@@ -11,5 +11,4 @@ public class test {
 		int x = (int) (Math.random() * tempTags.size());
 		System.out.print(tempTags.size());
 	}
-	
 }

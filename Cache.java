@@ -43,7 +43,7 @@ public class Cache {
 	ArrayList<ActualCache> LevelTwo = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelThree = new ArrayList<ActualCache>();
 	Memory memory;
-
+//m cannot be zero
 	public Cache(int s, int l, int m, int s2, int l2, int m2, int s3, int l3,
 			int m3, int cycles_access_data, int cycles_access_data2,
 			int cycles_access_data3, int cycles_access_memory,
@@ -146,8 +146,8 @@ public class Cache {
 			} else {
 				this.memory_accesses++;
 				if (type != 2 || write_miss_policy != 2) {
+					System.out.println("no replace");
 					if (tempTags.contains(null)) {
-						//System.out.println("no replace");
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
@@ -167,8 +167,8 @@ public class Cache {
 			}
 
 		}
-		//System.out.println(this.hit);
-		//System.out.println(this.memory_accesses);
+		System.out.println(this.hit);
+		System.out.println(this.memory_accesses);
 		
 	}
 
@@ -239,6 +239,7 @@ public class Cache {
 				}
 			}
 		}
+		System.out.println("2:"+this.hit2);
 	}
 
 	public void readLevelThree(String address, int type) {
@@ -288,11 +289,11 @@ public class Cache {
 		}
 	}
 	public static void main(String[]args) {
-		Cache c = new Cache(128, 16, 1, 0, 0, 0, 0, 0,
+		Cache c = new Cache(128, 16, 1, 64, 4, 2, 0, 0,
 				0,  3,  0,
 				 0,  100,
-				 2,  1, 
-				 0, 0,0,0, 1, new Memory());
+				 1,  1, 
+				 0, 0,0,0, 2, new Memory());
 		c.read("10000110", 1);
 		c.read("10000110", 2);
 		c.read("11010100", 1);
