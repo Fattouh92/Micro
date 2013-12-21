@@ -42,14 +42,20 @@ public class TomasuloAlg {
 		cycles = 0;
 	}
 	
-	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, int pc){
+	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, Register pc){
 		int[] regTable = new int[regs.size()];
-		String ins = memory.readData(Integer.toBinaryString(pc));
-		iCache.read(Integer.toBinaryString(pc));
+		for (int tempCounter=0; tempCounter < regTable.length; tempCounter++) {
+			regTable[tempCounter] = -1;
+		}
+		String ins = memory.readData(Integer.toBinaryString(pc.getValue()));
+		iCache.read(Integer.toBinaryString(pc.getValue()));
+		boolean addIns = true;
 		while (!ins.equals("")){
-			cycles++;
-			String[] insa = {ins, ""};
-			ib.enqueue(insa);
+			if (addIns){
+				cycles++;
+				String[] insa = {ins, ""};
+				ib.enqueue(insa);
+			}
 			for (int i = 0; i < ib.size(); i++){
 				cycles++;
 				
@@ -62,7 +68,7 @@ public class TomasuloAlg {
 							
 							case "load":
 						        if (!loadRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -82,7 +88,7 @@ public class TomasuloAlg {
 							
 							case "store":
 								if (!storeRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -101,7 +107,7 @@ public class TomasuloAlg {
 								break;
 							case "add":
 								if (!addRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -127,7 +133,7 @@ public class TomasuloAlg {
 							  break;
 							case "sub":
 								if (!subRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -153,7 +159,7 @@ public class TomasuloAlg {
 							  break;
 							case "nand":
 								if (!nandRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -179,7 +185,7 @@ public class TomasuloAlg {
 							  break;
 							case "mult":
 								if (!multRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -205,7 +211,7 @@ public class TomasuloAlg {
 							  break;
 							case "addi":
 								if (!addiRs.isFull()){
-						        	ib.modify(i, 2, "issued");
+						        	ib.modify(i, 1, "issued");
 						        	String[] robRec = {op, regsVal[0], "N"};
 						        	rob.enqueue(robRec);
 						        	tail++;
@@ -223,8 +229,196 @@ public class TomasuloAlg {
 						        }
 							  break;
 							default:
-								break;
+							  break;
 						}
+					}
+				}
+				
+				else if(ib.get(i,1).equals("issued")){
+					String op = checkOp(ib.get(i,0));
+					int index = 0;
+					switch (op) {					
+						case "load":
+							for (int k = 0; k < loadRs.size(); k++){
+								if (loadRs.get(k, 3).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (loadRs.get(index, 4).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (loadRs.get(index, 2).equals("")){
+								int rem = Integer.parseInt(loadRs.get(index, 4));
+								rem--;
+								loadRs.modify(index, 4, Integer.toString(rem));
+							}
+							else{
+								if (freeDest(regs, regTable, loadRs.get(index, 2))){
+									loadRs.modify(index, 1, loadRs.get(index, 2));
+									loadRs.modify(index, 2, "");
+								}
+							}
+							break;
+						case "store":
+							for (int k = 0; k < storeRs.size(); k++){
+								if (storeRs.get(k, 3).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (storeRs.get(index, 4).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (storeRs.get(index, 2).equals("")){
+								int rem = Integer.parseInt(storeRs.get(index, 4));
+								rem--;
+								storeRs.modify(index, 4, Integer.toString(rem));
+							}
+							else{
+								if (freeDest(regs, regTable, storeRs.get(index, 2))){
+									storeRs.modify(index, 1, storeRs.get(index, 2));
+									storeRs.modify(index, 2, "");
+								}
+							}
+							break;
+						case "add":
+							for (int k = 0; k < addRs.size(); k++){
+								if (addRs.get(k, 5).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (addRs.get(index, 6).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (addRs.get(index, 3).equals("") && addRs.get(index, 4).equals("")){
+								int rem = Integer.parseInt(addRs.get(index, 6));
+								rem--;
+								addRs.modify(index, 6, Integer.toString(rem));
+							}
+							else{
+								if (addRs.get(index, 1).equals("")){
+									if (freeDest(regs, regTable, addRs.get(index, 3))){
+										addRs.modify(index, 1, addRs.get(index, 3));
+										addRs.modify(index, 3, "");
+									}
+								}
+								if (addRs.get(index, 2).equals("")){
+									if (freeDest(regs, regTable, addRs.get(index, 4))){
+										addRs.modify(index, 2, addRs.get(index, 4));
+										addRs.modify(index, 4, "");
+									}
+								}
+							}
+							break;
+						case "sub":
+							for (int k = 0; k < subRs.size(); k++){
+								if (subRs.get(k, 5).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (subRs.get(index, 6).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (subRs.get(index, 3).equals("") && subRs.get(index, 4).equals("")){
+								int rem = Integer.parseInt(subRs.get(index, 6));
+								rem--;
+								subRs.modify(index, 6, Integer.toString(rem));
+							}
+							else{
+								if (subRs.get(index, 1).equals("")){
+									if (freeDest(regs, regTable, subRs.get(index, 3))){
+										subRs.modify(index, 1, subRs.get(index, 3));
+										subRs.modify(index, 3, "");
+									}
+								}
+								if (subRs.get(index, 2).equals("")){
+									if (freeDest(regs, regTable, subRs.get(index, 4))){
+										subRs.modify(index, 2, subRs.get(index, 4));
+										subRs.modify(index, 4, "");
+									}
+								}
+							}
+							break;
+						case "nand":
+							for (int k = 0; k < nandRs.size(); k++){
+								if (nandRs.get(k, 5).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (nandRs.get(index, 6).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (nandRs.get(index, 3).equals("") && nandRs.get(index, 4).equals("")){
+								int rem = Integer.parseInt(nandRs.get(index, 6));
+								rem--;
+								nandRs.modify(index, 6, Integer.toString(rem));
+							}
+							else{
+								if (nandRs.get(index, 1).equals("")){
+									if (freeDest(regs, regTable, nandRs.get(index, 3))){
+										nandRs.modify(index, 1, nandRs.get(index, 3));
+										nandRs.modify(index, 3, "");
+									}
+								}
+								if (nandRs.get(index, 2).equals("")){
+									if (freeDest(regs, regTable, nandRs.get(index, 4))){
+										nandRs.modify(index, 2, nandRs.get(index, 4));
+										nandRs.modify(index, 4, "");
+									}
+								}
+							}
+							break;
+						case "mult":
+							for (int k = 0; k < multRs.size(); k++){
+								if (multRs.get(k, 5).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (multRs.get(index, 6).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (multRs.get(index, 3).equals("") && multRs.get(index, 4).equals("")){
+								int rem = Integer.parseInt(multRs.get(index, 6));
+								rem--;
+								multRs.modify(index, 6, Integer.toString(rem));
+							}
+							else{
+								if (multRs.get(index, 1).equals("")){
+									if (freeDest(regs, regTable, multRs.get(index, 3))){
+										multRs.modify(index, 1, multRs.get(index, 3));
+										multRs.modify(index, 3, "");
+									}
+								}
+								if (multRs.get(index, 2).equals("")){
+									if (freeDest(regs, regTable, multRs.get(index, 4))){
+										multRs.modify(index, 2, multRs.get(index, 4));
+										multRs.modify(index, 4, "");
+									}
+								}
+							}
+							break;
+						case "addi":
+							for (int k = 0; k < addiRs.size(); k++){
+								if (addiRs.get(k, 3).equals(Integer.toString(i))){
+									index = k;
+								}
+							}
+							if (addiRs.get(index, 4).equals(Integer.toString(0))){
+								ib.modify(i, 1, "executed");
+							}
+							else if (addiRs.get(index, 2).equals("")){
+								int rem = Integer.parseInt(addiRs.get(index, 4));
+								rem--;
+								addiRs.modify(index, 4, Integer.toString(rem));
+							}
+							else{
+								if (freeDest(regs, regTable, addiRs.get(index, 2))){
+									addiRs.modify(index, 1, addiRs.get(index, 2));
+									addiRs.modify(index, 2, "");
+								}
+							}
+							break;
+						default:
+							break;
 					}
 				}
 				
@@ -232,24 +426,46 @@ public class TomasuloAlg {
 		
 			
 			if (!ib.isFull()){
-				ins = memory.readData(Integer.toBinaryString(pc));
-				iCache.read(Integer.toBinaryString(pc));
+				pc.setValue((pc.getValue() + 1));
+				ins = memory.readData(Integer.toBinaryString(pc.getValue()));
+				iCache.read(Integer.toBinaryString(pc.getValue()));
+				addIns = true;
+			}
+			else{
+				addIns = false;
 			}
 		}
 	}
 	
 	public String checkOp(String ins){
-		return "";
+		return ins.split(" ")[0];
 	}
 	public String[] getRegs(String op, String ins){
 		String[] s = new String[3];
-		//[dest reg, reg1, reg2//offset]
+		String[] split = ins.split(" ");
+		s[0] = split[1];
+		s[1] = split[2];
+		s[3] = split[3];
 		return s;
 	}
 	public boolean freeDest(ArrayList<Register> regs, int[] regTable, String destReg){
+		int access = this.getRegIndex(regs, destReg);
+		if (access == -1){
+			return false;
+		}
+		if (regTable[access] == -1) {
+			return true;
+		}
 		return false;
 	}
+	
 	public int getRegIndex(ArrayList<Register> regs, String destReg){
+		for(int tempI =0; tempI<regs.size(); tempI++) {
+			String tempR = regs.get(tempI).name;
+			if (tempR.equals(destReg)) {
+				return tempI;
+			}
+		}
 		return -1;
 	}
 }
