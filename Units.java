@@ -1,6 +1,10 @@
 
 public class Units {
-
+	Cache cache;
+	
+	public Units(Cache c) {
+		cache = c;
+	}
 	
 	public void Add(Register d,Register s1,Register s2){
 		int sum=s1.getValue()+s2.getValue();
@@ -30,14 +34,16 @@ public class Units {
 	public void Load(Memory m,Register a,Register b,int immediate){
 		int val=immediate+b.getValue();
 		String address=Integer.toBinaryString(val);
+		cache.read(address, 1);
 		String val1=m.readData(address);
-		int value=Integer.parseInt(val1,2);
+		int value=Integer.parseInt(val1, 2);
 		a.setValue(value);
 	}
 	
 	public void Store(Memory m,Register a,Register b,int immediate){
 		int address=immediate+b.getValue();
 		String add=Integer.toBinaryString(address);
+		cache.read(add, 2);
 		String value=Integer.toBinaryString(a.getValue());
 		m.writeData(add, value);
 	}
