@@ -1,5 +1,6 @@
 
 public class Units {
+
 	
 	public void Add(Register d,Register s1,Register s2){
 		int sum=s1.getValue()+s2.getValue();
@@ -28,16 +29,16 @@ public class Units {
 	
 	public void Load(Memory m,Register a,Register b,int immediate){
 		int val=immediate+b.getValue();
-		String address=Integer.toString(val);
+		String address=Integer.toBinaryString(val);
 		String val1=m.readData(address);
-		int value=Integer.parseInt(val1);
+		int value=Integer.parseInt(val1,2);
 		a.setValue(value);
 	}
 	
 	public void Store(Memory m,Register a,Register b,int immediate){
 		int address=immediate+b.getValue();
-		String add=Integer.toString(address);
-		String value=Integer.toString(a.getValue());
+		String add=Integer.toBinaryString(address);
+		String value=Integer.toBinaryString(a.getValue());
 		m.writeData(add, value);
 	}
 	
