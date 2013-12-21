@@ -422,6 +422,10 @@ public class TomasuloAlg {
 					}
 				}
 				
+				else if (ib.get(i,1).equals("executed")){
+					
+				}
+				
 			}
 		
 			
