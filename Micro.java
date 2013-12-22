@@ -1,28 +1,240 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Micro {
 static int startAddress;
 static String[] instructions;
+static ArrayList<Register> registers = new ArrayList<Register>();
+static String[] cacheSpecifications;
+static Cache cache;
+static Memory memory = new Memory();
+static ICache icache;
+static TomasuloAlg tomasulo;
+static Assembler assembler = new Assembler();
+static Register pc = new Register("pc", 0);
+
         public static void startSimulation()
                         throws NumberFormatException, Exception {
         	Scanner in = new Scanner(System.in);
         	System.out.println("Please Enter the number of cache levels	you	want to	simulate.");
         	int cacheLevels = in.nextInt();
-        	//initialize cache with specified levels
-        	for(int j=1; j<=cacheLevels; j++){
-        		System.out.println("Please specify the full	cache geometry (S, L, M).");
-            	String cacheGeometry = in.nextLine();
-            	//specify cache geometry for each level
+        	switch(cacheLevels){
+        	case 1:
+        	System.out.println("Please Enter your specifications for the cache in the following format: "
+        			+ "first level s,l,m, "
+        			+ "first level hit_policy (1=write_throught 2=write_back),"
+        			+ "first level miss policy (1=write allocate 2=write around),"
+        			+ "first level cycles to access data,"
+        			+ "first level memory access time (in cycles)");
+        	cacheSpecifications = in.next().split(",");
+        	cache = new Cache(Integer.parseInt(cacheSpecifications[0]), 
+        			Integer.parseInt(cacheSpecifications[1]), 
+        			Integer.parseInt(cacheSpecifications[2]), 0, 0, 0, 0, 0,0, 
+        			Integer.parseInt(cacheSpecifications[5]), 0,0,
+        			Integer.parseInt(cacheSpecifications[6]),
+        			Integer.parseInt(cacheSpecifications[3]), 
+        			Integer.parseInt(cacheSpecifications[4]),0, 0,0,0, cacheLevels, memory);
+        	break;
+        	case 2:
+        		System.out.println("Please Enter your specifications for the cache in the following format: "
+            			+ "first level s,l,m, "
+            			+ "first level hit_policy (1=write_throught 2=write_back),"
+            			+ "first level miss policy (1=write allocate 2=write around),"
+            			+ "first level cycles to access data,"
+            			+ "memory access time (in cycles),"
+            			+ "second level s,l,m, "
+            			+ "second level hit_policy (1=write_throught 2=write_back),"
+            			+ "second level miss policy (1=write allocate 2=write around),"
+            			+ "second level cycles to access data");
+        		cacheSpecifications = in.next().split(",");
+            	cache = new Cache(Integer.parseInt(cacheSpecifications[0]), 
+            			Integer.parseInt(cacheSpecifications[1]), 
+            			Integer.parseInt(cacheSpecifications[2]), 
+            			Integer.parseInt(cacheSpecifications[7]), 
+            			Integer.parseInt(cacheSpecifications[8]),
+            			Integer.parseInt(cacheSpecifications[9]), 0, 0,0, 
+            			Integer.parseInt(cacheSpecifications[5]), 
+            			Integer.parseInt(cacheSpecifications[12]),0,
+            			Integer.parseInt(cacheSpecifications[6]),
+            			Integer.parseInt(cacheSpecifications[3]), 
+            			Integer.parseInt(cacheSpecifications[4]),
+            			Integer.parseInt(cacheSpecifications[10]), 
+            			Integer.parseInt(cacheSpecifications[11]),0,0, cacheLevels, memory);
+        		break;
+        	case 3:
+        		System.out.println("Please Enter your specifications for the cache in the following format: "
+            			+ "first level s,l,m, "
+            			+ "first level hit_policy (1=write_throught 2=write_back),"
+            			+ "first level miss policy (1=write allocate 2=write around),"
+            			+ "first level cycles to access data,"
+            			+ "memory access time (in cycles),"
+            			+ "second level s,l,m, "
+            			+ "second level hit_policy (1=write_throught 2=write_back),"
+            			+ "second level miss policy (1=write allocate 2=write around),"
+            			+ "second level cycles to access data,"
+            			+ "third level s,l,m, "
+            			+ "third level hit_policy (1=write_throught 2=write_back),"
+            			+ "third level miss policy (1=write allocate 2=write around),"
+            			+ "third level cycles to access data");
+        		cacheSpecifications = in.next().split(",");
+            	cache = new Cache(Integer.parseInt(cacheSpecifications[0]), 
+            			Integer.parseInt(cacheSpecifications[1]), 
+            			Integer.parseInt(cacheSpecifications[2]), 
+            			Integer.parseInt(cacheSpecifications[7]), 
+            			Integer.parseInt(cacheSpecifications[8]),
+            			Integer.parseInt(cacheSpecifications[9]), 
+            			Integer.parseInt(cacheSpecifications[13]), 
+            			Integer.parseInt(cacheSpecifications[14]),
+            			Integer.parseInt(cacheSpecifications[15]), 
+            			Integer.parseInt(cacheSpecifications[5]), 
+            			Integer.parseInt(cacheSpecifications[12]),
+            			Integer.parseInt(cacheSpecifications[18]),
+            			Integer.parseInt(cacheSpecifications[6]),
+            			Integer.parseInt(cacheSpecifications[3]), 
+            			Integer.parseInt(cacheSpecifications[4]),
+            			Integer.parseInt(cacheSpecifications[10]), 
+            			Integer.parseInt(cacheSpecifications[11]),
+            			Integer.parseInt(cacheSpecifications[16]),
+            			Integer.parseInt(cacheSpecifications[17]), cacheLevels, memory);
+        		break;        	
         	}
-        	//specify all other data required for program to start then initialize everything
-                Memory memory = new Memory();
-                Assembler assembler = new Assembler();
+        	System.out.println("Please Enter the number of instruction cache levels	you	want to	simulate.");
+        	int icacheLevels = in.nextInt();
+        	switch(icacheLevels){
+        	case 1:
+        	System.out.println("Please Enter your specifications for the instruction cache in the following format: "
+        			+ "first level s,l,m, "
+        			+ "first level hit_policy (1=write_throught 2=write_back),"
+        			+ "first level miss policy (1=write allocate 2=write around),"
+        			+ "first level cycles to access data,"
+        			+ "first level memory access time (in cycles)");
+        	cacheSpecifications = in.next().split(",");
+        	icache = new ICache(Integer.parseInt(cacheSpecifications[0]), 
+        			Integer.parseInt(cacheSpecifications[1]), 
+        			Integer.parseInt(cacheSpecifications[2]), 0, 0, 0, 0, 0,0, 
+        			Integer.parseInt(cacheSpecifications[5]), 0,0,
+        			Integer.parseInt(cacheSpecifications[6]),
+        			Integer.parseInt(cacheSpecifications[3]), 
+        			Integer.parseInt(cacheSpecifications[4]),0, 0,0,0, cacheLevels, memory);
+        	break;
+        	case 2:
+        		System.out.println("Please Enter your specifications for the instruction cache in the following format: "
+            			+ "first level s,l,m, "
+            			+ "first level hit_policy (1=write_throught 2=write_back),"
+            			+ "first level miss policy (1=write allocate 2=write around),"
+            			+ "first level cycles to access data,"
+            			+ "memory access time (in cycles),"
+            			+ "second level s,l,m, "
+            			+ "second level hit_policy (1=write_throught 2=write_back),"
+            			+ "second level miss policy (1=write allocate 2=write around),"
+            			+ "second level cycles to access data");
+        		cacheSpecifications = in.next().split(",");
+            	icache = new ICache(Integer.parseInt(cacheSpecifications[0]), 
+            			Integer.parseInt(cacheSpecifications[1]), 
+            			Integer.parseInt(cacheSpecifications[2]), 
+            			Integer.parseInt(cacheSpecifications[7]), 
+            			Integer.parseInt(cacheSpecifications[8]),
+            			Integer.parseInt(cacheSpecifications[9]), 0, 0,0, 
+            			Integer.parseInt(cacheSpecifications[5]), 
+            			Integer.parseInt(cacheSpecifications[12]),0,
+            			Integer.parseInt(cacheSpecifications[6]),
+            			Integer.parseInt(cacheSpecifications[3]), 
+            			Integer.parseInt(cacheSpecifications[4]),
+            			Integer.parseInt(cacheSpecifications[10]), 
+            			Integer.parseInt(cacheSpecifications[11]),0,0, cacheLevels, memory);
+        		break;
+        	case 3:
+        		System.out.println("Please Enter your specifications for the instruction cache in the following format: "
+            			+ "first level s,l,m, "
+            			+ "first level hit_policy (1=write_throught 2=write_back),"
+            			+ "first level miss policy (1=write allocate 2=write around),"
+            			+ "first level cycles to access data,"
+            			+ "memory access time (in cycles),"
+            			+ "second level s,l,m, "
+            			+ "second level hit_policy (1=write_throught 2=write_back),"
+            			+ "second level miss policy (1=write allocate 2=write around),"
+            			+ "second level cycles to access data,"
+            			+ "third level s,l,m, "
+            			+ "third level hit_policy (1=write_throught 2=write_back),"
+            			+ "third level miss policy (1=write allocate 2=write around),"
+            			+ "third level cycles to access data");
+        		cacheSpecifications = in.next().split(",");
+            	icache = new ICache(Integer.parseInt(cacheSpecifications[0]), 
+            			Integer.parseInt(cacheSpecifications[1]), 
+            			Integer.parseInt(cacheSpecifications[2]), 
+            			Integer.parseInt(cacheSpecifications[7]), 
+            			Integer.parseInt(cacheSpecifications[8]),
+            			Integer.parseInt(cacheSpecifications[9]), 
+            			Integer.parseInt(cacheSpecifications[13]), 
+            			Integer.parseInt(cacheSpecifications[14]),
+            			Integer.parseInt(cacheSpecifications[15]), 
+            			Integer.parseInt(cacheSpecifications[5]), 
+            			Integer.parseInt(cacheSpecifications[12]),
+            			Integer.parseInt(cacheSpecifications[18]),
+            			Integer.parseInt(cacheSpecifications[6]),
+            			Integer.parseInt(cacheSpecifications[3]), 
+            			Integer.parseInt(cacheSpecifications[4]),
+            			Integer.parseInt(cacheSpecifications[10]), 
+            			Integer.parseInt(cacheSpecifications[11]),
+            			Integer.parseInt(cacheSpecifications[16]),
+            			Integer.parseInt(cacheSpecifications[17]), cacheLevels, memory);
+        		break;        	
+        	}
+        	System.out.println("Please Enter your specifications for the hardware organization in the following format: "
+        			+ "instruction buffer size, "
+        			+ "number of load reservation stations,"
+        			+ "number of store reservation stations,"
+        			+ "number of add reservation stations,"
+        			+ "number of sub reservation stations,"
+        			+ "number of nand reservation stations,"
+        			+ "number of mul reservation stations,"
+        			+ "number of addi reservation stations,"
+        			+ "number of ROB entries,"
+        			+ "load cycles,"
+        			+ "store cycles,"
+        			+ "add cycles,"
+        			+ "nand cycles,"
+        			+ "mul cycles,"
+        			+ "addi cycles");
+        	String[] tomasuloSpecifications = in.next().split(",");
+        	tomasulo = new TomasuloAlg(Integer.parseInt(tomasuloSpecifications[0]),
+        			Integer.parseInt(tomasuloSpecifications[1]), 
+        			Integer.parseInt(tomasuloSpecifications[2]), 
+        			Integer.parseInt(tomasuloSpecifications[3]), 
+        			Integer.parseInt(tomasuloSpecifications[4]), 
+        			Integer.parseInt(tomasuloSpecifications[5]), 
+        			Integer.parseInt(tomasuloSpecifications[6]), 
+        			Integer.parseInt(tomasuloSpecifications[7]), 
+        			Integer.parseInt(tomasuloSpecifications[8]), 
+        			Integer.parseInt(tomasuloSpecifications[9]), 
+        			Integer.parseInt(tomasuloSpecifications[10]), 
+        			Integer.parseInt(tomasuloSpecifications[11]), 
+        			Integer.parseInt(tomasuloSpecifications[12]), 
+        			Integer.parseInt(tomasuloSpecifications[13]), 
+        			Integer.parseInt(tomasuloSpecifications[14]), 
+        			Integer.parseInt(tomasuloSpecifications[15]));
+        	System.out.println("Please enter the start address then write your program in the file.");
+        	startAddress = in.nextInt();
                 instructions = assembler.assemble(new File("src/pack/input_program.txt"));
                 for(int i=0; i<instructions.length; i++){
                 	memory.writeData(Integer.toBinaryString(startAddress),instructions[i]);
                 	startAddress+=2;
                 }
+                for (int q=0; q<= assembler.returnRegisters().size(); q++){
+                	if(!registers.contains(assembler.returnRegisters().get(q))){
+                		Register r = new Register(assembler.returnRegisters().get(q), -1);
+                		registers.add(r);
+                	}
+                }
+                System.out.println("Please enter the memory data required for your program in the form (value, address), if no data, enter (no data).");
+                String[] memData = in.next().split(",");
+                if(!memData[0].equals("no data")){
+                	for(int d=0; d<memData.length; d+=2){
+                		memory.writeData(memData[d+1], memData[d]);
+                	}
+                }
+                tomasulo.start(registers, icache, cache, memory, pc);
         }
 
         public static void main(String[] args) throws NumberFormatException,
