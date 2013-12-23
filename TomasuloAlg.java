@@ -467,7 +467,6 @@ public class TomasuloAlg {
 				addIns = true;
 			}
 			else{
-				ins = "";
 				addIns = false;
 			}
 			
