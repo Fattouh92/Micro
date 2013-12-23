@@ -418,7 +418,7 @@ public class TomasuloAlg {
 								addiRs.modify(index, 4, Integer.toString(rem));
 							}
 							else{
-								if (!rob.get(Integer.parseInt(nandRs.get(index, 2)), 0).equals("")){
+								if (!rob.get(Integer.parseInt(addiRs.get(index, 2)), 0).equals("")){
 									addiRs.modify(index, 1, addiRs.get(index, 2));
 									addiRs.modify(index, 2, "");
 								}
