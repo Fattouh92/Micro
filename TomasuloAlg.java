@@ -43,26 +43,32 @@ public class TomasuloAlg {
 	}
 	
 	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, Register pc){
+	//public void start(ArrayList<Register> regs, String[] mem, Register pc){
 		int[] regTable = new int[regs.size()];
 		for (int tempCounter=0; tempCounter < regTable.length; tempCounter++) {
 			regTable[tempCounter] = -1;
 		}
 		String ins = memory.readData(Integer.toBinaryString(pc.getValue()));
 		iCache.read(Integer.toBinaryString(pc.getValue()));
+		//String ins = mem[pc.getValue()];
 		boolean addIns = true;
 		while (!ins.equals("")){
 			if (addIns){
 				cycles++;
 				String[] insa = {ins, "", ""};
 				ib.enqueue(insa);
+				/*
+				System.out.println("cycles: " + cycles);
+				System.out.println("ib: ");
+				printing(ib, 3);
+				*/
 			}
+			cycles++;
 			for (int i = 0; i < ib.size(); i++){
-				cycles++;
 				
 				if (ib.get(i,1).equals("")){
 					String op = checkOp(ib.get(i,0));
 					String[] regsVal = getRegs(op, ib.get(i,0));
-					//boolean valid = freeDest(regs, regTable, regsVal[0]);
 					if (!rob.isFull()){
 						switch (op) { 
 							
@@ -434,17 +440,37 @@ public class TomasuloAlg {
 				}
 				
 			}
-		
+/*
+			System.out.println("cycles: " + cycles);
+			System.out.println("ib: ");
+			printing(ib, 3);
+			System.out.println("rob: ");
+			printing(rob, 2);
+			System.out.println("load rs: ");
+			printing(loadRs, 5);
+			System.out.println("mult rs: ");
+			printing(multRs, 7);
+			System.out.println("sub rs: ");
+			printing(subRs, 7);
+			System.out.println("nand rs: ");
+			printing(nandRs, 7);
+			System.out.println("add rs: ");
+			printing(addRs, 7);
+			System.out.println("reg table: " + regTable);
+*/			
 			
 			if (!ib.isFull()){
 				pc.setValue((pc.getValue() + 1));
 				ins = memory.readData(Integer.toBinaryString(pc.getValue()));
 				iCache.read(Integer.toBinaryString(pc.getValue()));
+				//ins = mem[pc.getValue()];
 				addIns = true;
 			}
 			else{
+				ins = "";
 				addIns = false;
 			}
+			
 		}
 	}
 	
@@ -456,7 +482,7 @@ public class TomasuloAlg {
 		String[] split = ins.split(" ");
 		s[0] = split[1];
 		s[1] = split[2];
-		s[3] = split[3];
+		s[2] = split[3];
 		return s;
 	}
 	public boolean freeDest(ArrayList<Register> regs, int[] regTable, String destReg){
@@ -479,4 +505,38 @@ public class TomasuloAlg {
 		}
 		return -1;
 	}
+	/*
+	public void printing(QueueOfArray x, int width){
+		for (int i = 0; i< x.size(); i++){
+			for (int j =0; j < width; j++){
+				System.out.print(x.get(i, j) + " ");
+			}
+			System.out.println();
+		}
+	}
+	
+	public static void main(String [] args){
+		TomasuloAlg t = new TomasuloAlg(6, 2, 0, 2, 2, 2, 2, 0, 6, 1, 1, 2, 2, 12, 6, 2);
+		Register F6 = new Register("F6", 1);
+		Register R2 = new Register("R2", 1);
+		Register F2 = new Register("F2", 1);
+		Register R3 = new Register("R3", 1);
+		Register F0 = new Register("F0", 1);
+		Register F4 = new Register("F4", 1);
+		Register F8 = new Register("F8", 1);
+		Register F10 = new Register("F10", 1);
+		Register pc = new Register("pc", 0);
+		ArrayList<Register> regs = new ArrayList<Register>();
+		regs.add(F6);
+		regs.add(R2);
+		regs.add(F2);
+		regs.add(R3);
+		regs.add(F0);
+		regs.add(F4);
+		regs.add(F8);
+		regs.add(F10);
+		String[] mem = {"load F6 R2 32", "load F2 R3 44", "mult F0 F2 F4", "sub F8 F2 F6", "nand F10 F0 F6", "add F6 F8 F2", ""};
+		t.start(regs, mem, pc);
+	}
+	*/
 }
