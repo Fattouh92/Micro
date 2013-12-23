@@ -44,7 +44,7 @@ public class Units {
 		int address=immediate+b.getValue();
 		String add=Integer.toBinaryString(address);
 		cache.read(add, 2);
-		String value=Integer.toString(a.getValue());
+		String value=Integer.toBinaryString(a.getValue());
 		m.writeData(add, value);
 	}
 	

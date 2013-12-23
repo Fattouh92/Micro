@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.ArrayList;
 
 public class Assembler {
 
@@ -15,7 +16,7 @@ public class Assembler {
         BufferedWriter bw;
         File input_file;
         File first_pass_file;
-
+        ArrayList<String> registerNames = new ArrayList<String>();
 
         public String[] assemble(File file) {
                 String[] result = new String[countNumberOfLines(file)];
@@ -25,6 +26,59 @@ public class Assembler {
                         int content;
                         while ((content = fis.read()) != -1) {
                         	if(content == 10){
+                        		String[] instruction = result[instructionNumber].split(" ");
+                        		switch (instruction[0]) { 
+    							
+    							case "load":
+    						        registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    								break;
+    							
+    							case "store":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    								break;
+    							case "add":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    						        registerNames.add(instruction[3]);
+    							  break;
+    							case "sub":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    						        registerNames.add(instruction[3]);
+    							  break;
+    							case "nand":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    						        registerNames.add(instruction[3]);
+    							  break;
+    							case "mult":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    						        registerNames.add(instruction[3]);
+    							  break;
+    							case "addi":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    							  break;
+    							case "jmp":
+    								registerNames.add(instruction[1]);
+    							  break;
+    							case "beq":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    							  break;
+    							case "jalr":
+    								registerNames.add(instruction[1]);
+    						        registerNames.add(instruction[2]);
+    							  break;
+    							case "ret":
+    								registerNames.add(instruction[1]);
+    							  break;
+    							default:
+    								break;
+    						}
                         		instructionNumber++;
                         	}
                         	else{
@@ -37,6 +91,10 @@ public class Assembler {
                         e.printStackTrace();
                 }
                 return result;
+        }
+        
+        public ArrayList<String> returnRegisters(){
+        	return registerNames;
         }
      
         public static int countNumberOfLines(File file) {
