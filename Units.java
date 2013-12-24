@@ -6,9 +6,9 @@ public class Units {
 		cache = c;
 	}
 	
-	public void Add(Register d,Register s1,Register s2){
-		int sum=s1.getValue()+s2.getValue();
-		d.setValue(sum);
+	public void Subtract(Register d,Register s1,Register s2){
+		int result=s1.getValue()-s2.getValue();
+		d.setValue(result);
 		}
 	
 	public void Addi(Register d,Register s1,int value){
@@ -16,20 +16,20 @@ public class Units {
 		d.setValue(sum);
 		}
 	
-	public void Subtract(Register d,Register s1,Register s2){
-			int result=s1.getValue()-s2.getValue();
-			d.setValue(result);
-			}
+	public void NAND(Register d,Register s1,Register s2){
+		int result=~(s1.getValue()&s2.getValue());
+		 d.setValue(result);
+	} 
 	
+	public void Add(Register d,Register s1,Register s2){
+		int sum=s1.getValue()+s2.getValue();
+		d.setValue(sum);
+		}
 	public void Multiply(Register d,Register s1,Register s2){
 		int result=s1.getValue()*s2.getValue();
 		d.setValue(result);
 	}
 	
-	public void NAND(Register d,Register s1,Register s2){
-		int result=~(s1.getValue()&s2.getValue());
-		 d.setValue(result);
-	} 
 	
 	public void Load(Memory m,Register a,Register b,int immediate){
 		int val=immediate+b.getValue();
