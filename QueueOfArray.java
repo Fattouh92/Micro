@@ -1,10 +1,10 @@
 
 public class QueueOfArray {
-		private int maxSize; // Maximum Capacity for the queue
-		private String[][] queArray; // The array that holds the items
-		private int front;
-		private int rear;
-		private int nItems;
+		int maxSize; // Maximum Capacity for the queue
+		String[][] queArray; // The array that holds the items
+		int front;
+		int rear;
+		int nItems;
 		// constructor
 		public QueueOfArray(int height, int width) {
 			maxSize = height; // set array size
