@@ -27,6 +27,16 @@ public class QueueOfArray {
 			nItems--;
 			return result;
 		}
+		public void remove(int index){
+			if (index == front){
+				dequeue();
+			}
+			else{
+				String[] empty = {""};
+				queArray[index] = empty;
+				nItems--;
+			}
+		}
 		public String[] peek() {
 			return queArray[front];
 		}

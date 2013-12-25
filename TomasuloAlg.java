@@ -3,8 +3,6 @@ import java.util.ArrayList;
 public class TomasuloAlg {
 	QueueOfArray ib;
 	QueueOfArray rob;
-	Pointer head;
-	Pointer tail;
 	QueueOfArray loadRs;
 	QueueOfArray storeRs;
 	QueueOfArray addRs;
@@ -23,8 +21,6 @@ public class TomasuloAlg {
 	public TomasuloAlg(int ibSize, int loadRsSize, int storeRsSize, int addRsSize, int subRsSize, int nandRsSize, int mulRsSize, int addiRsSize, int robSize, int loadCyc, int storeCyc, int addCyc, int subCyc, int nandCyc, int multCyc, int addiCyc){
 		ib = new QueueOfArray(ibSize,3);
 		rob = new QueueOfArray(robSize,2);
-		head = new Pointer(robSize);
-		tail = new Pointer(robSize);
 		loadRs = new QueueOfArray(loadRsSize,5);
 		storeRs = new QueueOfArray(storeRsSize,5);
 		addRs = new QueueOfArray(addRsSize,7);
@@ -44,6 +40,7 @@ public class TomasuloAlg {
 	
 	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, Register pc){
 	//public void start(ArrayList<Register> regs, String[] mem, Register pc){
+		Units fu = new Units(cache);
 		int[] regTable = new int[regs.size()];
 		for (int tempCounter=0; tempCounter < regTable.length; tempCounter++) {
 			regTable[tempCounter] = -1;
@@ -75,170 +72,163 @@ public class TomasuloAlg {
 							case "load":
 						        if (!loadRs.isFull()){
 						        	ib.modify(i, 1, "issued");
-						        	ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+						        	ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	String[] entry;
 						        	if (valid){
-						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(tail.val()), Integer.toString(loadCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(rob.rear), Integer.toString(loadCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(tail.val()), Integer.toString(loadCyc)};
+						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.rear), Integer.toString(loadCyc)};
 						        	}
 						        	loadRs.enqueue(entry);
-						        	tail.inc();
 						        }
 								break;
 							
 							case "store":
 								if (!storeRs.isFull()){
 						        	ib.modify(i, 1, "issued");
-						        	ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+						        	ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	String[] entry;
 						        	if (valid){
-						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(tail.val()), Integer.toString(storeCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(rob.rear), Integer.toString(storeCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(tail.val()), Integer.toString(storeCyc)};
+						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.rear), Integer.toString(storeCyc)};
 						        	}
 						        	storeRs.enqueue(entry);
-						        	tail.inc();
 						        }
 								break;
 							case "add":
 								if (!addRs.isFull()){
 						        	ib.modify(i, 1, "issued");
-						        	ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+						        	ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
 						        	String[] entry;
 						        	if (valid && valid2){
-						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(tail.val()), Integer.toString(addCyc)};
+						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(rob.rear), Integer.toString(addCyc)};
 						        	}
 						        	else if(valid){
-						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(addCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(addCyc)};
 						        	}
 						        	else if(valid2){
-						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(tail.val()) , Integer.toString(addCyc)};
+						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.rear) , Integer.toString(addCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(addCyc)};
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(addCyc)};
 						        	}
 						        	addRs.enqueue(entry);
-						        	tail.inc();
 						        }
 							  break;
 							case "sub":
 								if (!subRs.isFull()){
 									ib.modify(i, 1, "issued");
-									ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
 						        	String[] entry;
 						        	if (valid && valid2){
-						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(tail.val()), Integer.toString(subCyc)};
+						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(rob.rear), Integer.toString(subCyc)};
 						        	}
 						        	else if(valid){
-						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(subCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(subCyc)};
 						        	}
 						        	else if(valid2){
-						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(tail.val()) , Integer.toString(subCyc)};
+						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.rear) , Integer.toString(subCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(subCyc)};
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(subCyc)};
 						        	}
 						        	subRs.enqueue(entry);
-						        	tail.inc();
 						        }
 							  break;
 							case "nand":
 								if (!nandRs.isFull()){
 									ib.modify(i, 1, "issued");
-									ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
 						        	String[] entry;
 						        	if (valid && valid2){
-						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(tail.val()), Integer.toString(nandCyc)};
+						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(rob.rear), Integer.toString(nandCyc)};
 						        	}
 						        	else if(valid){
-						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(nandCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(nandCyc)};
 						        	}
 						        	else if(valid2){
-						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(tail.val()) , Integer.toString(nandCyc)};
+						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.rear) , Integer.toString(nandCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(nandCyc)};
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(nandCyc)};
 						        	}
 						        	nandRs.enqueue(entry);
-						        	tail.inc();
 						        }
 							  break;
 							case "mult":
 								if (!multRs.isFull()){
 									ib.modify(i, 1, "issued");
-									ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
 						        	String[] entry;
 						        	if (valid && valid2){
-						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(tail.val()), Integer.toString(multCyc)};
+						        		entry = new String[]{"Y", regsVal[1], regsVal[2], "", "", Integer.toString(rob.rear), Integer.toString(multCyc)};
 						        	}
 						        	else if(valid){
-						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(multCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(multCyc)};
 						        	}
 						        	else if(valid2){
-						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(tail.val()) , Integer.toString(multCyc)};
+						        		entry = new String[]{"Y", "", regsVal[2], Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.rear) , Integer.toString(multCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(tail.val()) , Integer.toString(multCyc)};
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.rear) , Integer.toString(multCyc)};
 						        	}
 						        	multRs.enqueue(entry);
-						        	tail.inc();
 						        }
 							  break;
 							case "addi":
 								if (!addiRs.isFull()){
 									ib.modify(i, 1, "issued");
-									ib.modify(i, 2, Integer.toString(tail.val()));
 						        	String[] robRec = {"", "N"};
 						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
-						        	regTable[regIndex] = tail.val();
+						        	regTable[regIndex] = rob.rear;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	String[] entry;
 						        	if (valid){
-						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(tail.val()), Integer.toString(addiCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(rob.rear), Integer.toString(addiCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(tail.val()), Integer.toString(addiCyc)};
+						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.rear), Integer.toString(addiCyc)};
 						        	}
 						        	addiRs.enqueue(entry);
-						        	tail.inc();
 						        }
 							  break;
 							default:
@@ -436,10 +426,108 @@ public class TomasuloAlg {
 				}
 				
 				else if (ib.get(i,1).equals("executed")){
-					
+					String op = checkOp(ib.get(i,0));
+					String[] regsVal = getRegs(op, ib.get(i,0));
+					int index = 0;
+					String result;
+					switch (op) {					
+						case "load":
+							for (int k = 0; k < loadRs.size(); k++){
+								if (loadRs.get(k, 3).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.Load(memory, getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), Integer.parseInt(regsVal[2]));
+							rob.modify(Integer.parseInt(loadRs.get(index, 3)), 0, result);
+							rob.modify(Integer.parseInt(loadRs.get(index, 3)), 1, "Y");
+							loadRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						case "store":
+							for (int k = 0; k < storeRs.size(); k++){
+								if (storeRs.get(k, 3).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.Store(memory, getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), Integer.parseInt(regsVal[2]));
+							rob.modify(Integer.parseInt(storeRs.get(index, 3)), 0, result);
+							rob.modify(Integer.parseInt(storeRs.get(index, 3)), 1, "Y");
+							storeRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						case "add":
+							for (int k = 0; k < addRs.size(); k++){
+								if (addRs.get(k, 5).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.Add(getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), getRegOrg(regs, regsVal[2]));
+							rob.modify(Integer.parseInt(addRs.get(index, 5)), 0, result);
+							rob.modify(Integer.parseInt(addRs.get(index, 5)), 1, "Y");
+							addRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						case "sub":
+							for (int k = 0; k < subRs.size(); k++){
+								if (subRs.get(k, 5).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.Subtract(getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), getRegOrg(regs, regsVal[2]));
+							rob.modify(Integer.parseInt(subRs.get(index, 5)), 0, result);
+							rob.modify(Integer.parseInt(subRs.get(index, 5)), 1, "Y");
+							subRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						case "nand":
+							for (int k = 0; k < nandRs.size(); k++){
+								if (nandRs.get(k, 5).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.NAND(getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), getRegOrg(regs, regsVal[2]));
+							rob.modify(Integer.parseInt(nandRs.get(index, 5)), 0, result);
+							rob.modify(Integer.parseInt(nandRs.get(index, 5)), 1, "Y");
+							nandRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						case "mult":
+							for (int k = 0; k < multRs.size(); k++){
+								if (multRs.get(k, 5).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.Multiply(getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), getRegOrg(regs, regsVal[2]));
+							rob.modify(Integer.parseInt(multRs.get(index, 5)), 0, result);
+							rob.modify(Integer.parseInt(multRs.get(index, 5)), 1, "Y");
+							multRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						case "addi":
+							for (int k = 0; k < addiRs.size(); k++){
+								if (addiRs.get(k, 3).equals(ib.get(i, 2))){
+									index = k;
+								}
+							}
+							result = fu.Addi(getRegOrg(regs, regsVal[0]), getRegOrg(regs, regsVal[1]), Integer.parseInt(regsVal[2]));
+							rob.modify(Integer.parseInt(addiRs.get(index, 3)), 0, result);
+							rob.modify(Integer.parseInt(addiRs.get(index, 3)), 1, "Y");
+							addiRs.remove(index);
+							ib.modify(i, 1, "written");
+							break;
+						default:
+							break;
+					}
 				}
 				
 			}
+			
+			if (rob.peek()[1].equals("Y")){
+				fu.commit();
+				rob.dequeue();
+				ib.dequeue();
+			}
+			
 /*
 			System.out.println("cycles: " + cycles);
 			System.out.println("ib: ");
@@ -503,6 +591,15 @@ public class TomasuloAlg {
 			}
 		}
 		return -1;
+	}
+	public Register getRegOrg(ArrayList<Register> regs, String reg){
+		for(int tempI =0; tempI<regs.size(); tempI++) {
+			String tempR = regs.get(tempI).name;
+			if (tempR.equals(reg)) {
+				return regs.get(tempI);
+			}
+		}
+		return null;
 	}
 	/*
 	public void printing(QueueOfArray x, int width){
