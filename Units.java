@@ -6,46 +6,56 @@ public class Units {
 		cache = c;
 	}
 	
-	public void Subtract(Register d,Register s1,Register s2){
+	public int AddSub(String type,Register d,Register s1,Register s2){
+		if(type.equals("Add")){
+			int sum=s1.getValue()+s2.getValue();
+			d.setValue(sum);
+			return sum;
+		}
+		else{
 		int result=s1.getValue()-s2.getValue();
 		d.setValue(result);
+		return result;
+		}
 		}
 	
-	public void Addi(Register d,Register s1,int value){
+	public int Addi(Register d,Register s1,int value){
 		int sum=s1.getValue()+value;
 		d.setValue(sum);
+		return sum;
 		}
 	
-	public void NAND(Register d,Register s1,Register s2){
+	public int NAND(Register d,Register s1,Register s2){
 		int result=~(s1.getValue()&s2.getValue());
 		 d.setValue(result);
+		 return result;
 	} 
 	
-	public void Add(Register d,Register s1,Register s2){
-		int sum=s1.getValue()+s2.getValue();
-		d.setValue(sum);
-		}
-	public void Multiply(Register d,Register s1,Register s2){
+	public int Multiply(Register d,Register s1,Register s2){
 		int result=s1.getValue()*s2.getValue();
 		d.setValue(result);
+		return result;
 	}
 	
 	
-	public void Load(Memory m,Register a,Register b,int immediate){
+	public int LoadStore(String type,Memory m,Register a,Register b,int immediate){
+		if(type.equals("Load")){
 		int val=immediate+b.getValue();
 		String address=Integer.toBinaryString(val);
 		cache.read(address, 1);
 		String val1=m.readData(address);
 		int value=Integer.parseInt(val1, 2);
 		a.setValue(value);
-	}
-	
-	public void Store(Memory m,Register a,Register b,int immediate){
-		int address=immediate+b.getValue();
-		String add=Integer.toBinaryString(address);
-		cache.read(add, 2);
-		String value=Integer.toBinaryString(a.getValue());
-		m.writeData(add, value);
+		return value;
+		}
+		else{
+			int address=immediate+b.getValue();
+			String add=Integer.toBinaryString(address);
+			cache.read(add, 2);
+			String value=Integer.toBinaryString(a.getValue());
+			m.writeData(add, value);
+			return a.getValue();
+		}
 	}
 	
    public void BEQ(Register pc,Register a,Register b,int immediate){
@@ -67,5 +77,15 @@ public class Units {
    
    public void Return(Register a,Register pc){
 	   pc.setValue(a.getValue());
+   }
+   
+   public void CommitOP(int value,Register d){
+	   d.setValue(value);
+   }
+   public void CommitStore(Memory m,int value,int address,int offset){
+	   int write = address+offset;
+	   String add=Integer.toBinaryString(write);
+	   String val=Integer.toBinaryString(value);
+	   m.writeData(add,val);
    }
 }
