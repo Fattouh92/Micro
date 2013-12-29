@@ -3,35 +3,27 @@ import java.util.ArrayList;
 public class TomasuloAlg {
 	QueueOfArray ib;
 	QueueOfArray rob;
-	QueueOfArray loadRs;
-	QueueOfArray storeRs;
-	QueueOfArray addRs;
-	QueueOfArray subRs;
+	QueueOfArray loadStoreRs;
+	QueueOfArray addSubRs;
 	QueueOfArray nandRs;
 	QueueOfArray multRs;
 	QueueOfArray addiRs;
-	int loadCyc;
-	int storeCyc;
-	int addCyc;
-	int subCyc;
+	int loadStoreCyc;
+	int addSubCyc;
 	int nandCyc;
 	int multCyc;
 	int addiCyc;
 	int cycles;
-	public TomasuloAlg(int ibSize, int loadRsSize, int storeRsSize, int addRsSize, int subRsSize, int nandRsSize, int mulRsSize, int addiRsSize, int robSize, int loadCyc, int storeCyc, int addCyc, int subCyc, int nandCyc, int multCyc, int addiCyc){
+	public TomasuloAlg(int ibSize, int loadStoreRsSize, int addSubRsSize, int nandRsSize, int multRsSize, int addiRsSize, int robSize, int loadStoreCyc, int addSubCyc, int nandCyc, int multCyc, int addiCyc){
 		ib = new QueueOfArray(ibSize,3);
-		rob = new QueueOfArray(robSize,2);
-		loadRs = new QueueOfArray(loadRsSize,5);
-		storeRs = new QueueOfArray(storeRsSize,5);
-		addRs = new QueueOfArray(addRsSize,7);
-		subRs = new QueueOfArray(subRsSize,7);
+		rob = new QueueOfArray(robSize,3);
+		loadStoreRs = new QueueOfArray(loadStoreRsSize,5);
+		addSubRs = new QueueOfArray(addSubRsSize,7);
 		nandRs = new QueueOfArray(nandRsSize,7);
-		multRs = new QueueOfArray(mulRsSize,7);
+		multRs = new QueueOfArray(multRsSize,7);
 		addiRs = new QueueOfArray(addiRsSize,5);
-		this.loadCyc = loadCyc;
-		this.storeCyc = storeCyc;
-		this.addCyc = addCyc;
-		this.subCyc = subCyc;
+		this.loadStoreCyc = loadStoreCyc;
+		this.addSubCyc = addSubCyc;
 		this.nandCyc = nandCyc;
 		this.multCyc = multCyc;
 		this.addiCyc = addiCyc;
@@ -70,9 +62,9 @@ public class TomasuloAlg {
 						switch (op) { 
 							
 							case "load":
-						        if (!loadRs.isFull()){
+						        if (!loadStoreRs.isFull()){
 						        	ib.modify(i, 1, "issued");
-						        	String[] robRec = {"", "N"};
+						        	String[] robRec = {"", "N", regsVal[0]};
 						        	rob.enqueue(robRec);
 						        	ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
@@ -80,19 +72,19 @@ public class TomasuloAlg {
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	String[] entry;
 						        	if (valid){
-						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(rob.rear), Integer.toString(loadCyc)};
+						        		entry = new String[]{"Y", regsVal[1], "", Integer.toString(rob.rear), Integer.toString(loadStoreCyc)};
 						        	}
 						        	else{
-						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.rear), Integer.toString(loadCyc)};
+						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.rear), Integer.toString(loadStoreCyc)};
 						        	}
-						        	loadRs.enqueue(entry);
+						        	loadStoreRs.enqueue(entry);
 						        }
 								break;
 							
 							case "store":
-								if (!storeRs.isFull()){
+								if (!loadStoreRs.isFull()){
 						        	ib.modify(i, 1, "issued");
-						        	String[] robRec = {"", "N"};
+						        	String[] robRec = {"", "N", regsVal[1] + " " + regsVal[2]};
 						        	rob.enqueue(robRec);
 						        	ib.modify(i, 2, Integer.toString(rob.rear));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
