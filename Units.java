@@ -7,7 +7,7 @@ public class Units {
 	}
 	
 	public int AddSub(String type,Register d,Register s1,Register s2){
-		if(type.equals("Add")){
+		if(type.equals("add")){
 			int sum=s1.getValue()+s2.getValue();
 			d.setValue(sum);
 			return sum;
@@ -39,7 +39,7 @@ public class Units {
 	
 	
 	public int LoadStore(String type,Memory m,Register a,Register b,int immediate){
-		if(type.equals("Load")){
+		if(type.equals("load")){
 		int val=immediate+b.getValue();
 		String address=Integer.toBinaryString(val);
 		cache.read(address, 1);
@@ -82,8 +82,8 @@ public class Units {
    public void CommitOP(int value,Register d){
 	   d.setValue(value);
    }
-   public void CommitStore(Memory m,int value,int address,int offset){
-	   int write = address+offset;
+   public void CommitStore(Memory m,int value,Register address,int offset){
+	   int write = address.getValue()+offset;
 	   String add=Integer.toBinaryString(write);
 	   String val=Integer.toBinaryString(value);
 	   m.writeData(add,val);
