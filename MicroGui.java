@@ -330,17 +330,14 @@ public class MicroGui extends javax.swing.JFrame {
         	}
         	System.out.println("Please Enter your specifications for the hardware organization in the following format: "
         			+ "instruction buffer size, "
-        			+ "number of load reservation stations,"
-        			+ "number of store reservation stations,"
-        			+ "number of add reservation stations,"
-        			+ "number of sub reservation stations,"
+        			+ "number of load/store reservation stations,"
+        			+ "number of add/sub reservation stations,"
         			+ "number of nand reservation stations,"
         			+ "number of mul reservation stations,"
         			+ "number of addi reservation stations,"
         			+ "number of ROB entries,"
-        			+ "load cycles,"
-        			+ "store cycles,"
-        			+ "add cycles,"
+        			+ "load/store cycles,"
+        			+ "add/sub cycles,"
         			+ "nand cycles,"
         			+ "mul cycles,"
         			+ "addi cycles");
@@ -356,11 +353,7 @@ public class MicroGui extends javax.swing.JFrame {
         			Integer.parseInt(tomasuloSpecifications[8]), 
         			Integer.parseInt(tomasuloSpecifications[9]), 
         			Integer.parseInt(tomasuloSpecifications[10]), 
-        			Integer.parseInt(tomasuloSpecifications[11]), 
-        			Integer.parseInt(tomasuloSpecifications[12]), 
-        			Integer.parseInt(tomasuloSpecifications[13]), 
-        			Integer.parseInt(tomasuloSpecifications[14]), 
-        			Integer.parseInt(tomasuloSpecifications[15]));
+        			Integer.parseInt(tomasuloSpecifications[11]));
         	System.out.println("Please enter the start address then write your program in the file.");
         	startAddress =Integer.parseInt(st_addr.getText());
                 instructions = assembler.assemble(file);

@@ -183,17 +183,14 @@ static Register pc = new Register("pc", 0);
         	}
         	System.out.println("Please Enter your specifications for the hardware organization in the following format: "
         			+ "instruction buffer size, "
-        			+ "number of load reservation stations,"
-        			+ "number of store reservation stations,"
-        			+ "number of add reservation stations,"
-        			+ "number of sub reservation stations,"
+        			+ "number of load/store reservation stations,"
+        			+ "number of add/sub reservation stations,"
         			+ "number of nand reservation stations,"
         			+ "number of mul reservation stations,"
         			+ "number of addi reservation stations,"
         			+ "number of ROB entries,"
-        			+ "load cycles,"
-        			+ "store cycles,"
-        			+ "add cycles,"
+        			+ "load/store cycles,"
+        			+ "add/sub cycles,"
         			+ "nand cycles,"
         			+ "mul cycles,"
         			+ "addi cycles");
@@ -209,31 +206,26 @@ static Register pc = new Register("pc", 0);
         			Integer.parseInt(tomasuloSpecifications[8]), 
         			Integer.parseInt(tomasuloSpecifications[9]), 
         			Integer.parseInt(tomasuloSpecifications[10]), 
-        			Integer.parseInt(tomasuloSpecifications[11]), 
-        			Integer.parseInt(tomasuloSpecifications[12]), 
-        			Integer.parseInt(tomasuloSpecifications[13]), 
-        			Integer.parseInt(tomasuloSpecifications[14]), 
-        			Integer.parseInt(tomasuloSpecifications[15]));
+        			Integer.parseInt(tomasuloSpecifications[11]));
         	System.out.println("Please enter the start address then write your program in the file.");
         	startAddress = in.nextInt();
-                instructions = assembler.assemble(new File("src/pack/input_program.txt"));
+                instructions = assembler.assemble(new File("test.txt"));
                 for(int i=0; i<instructions.length; i++){
                 	memory.writeData(Integer.toBinaryString(startAddress),instructions[i]);
                 	startAddress+=2;
                 }
-                for (int q=0; q<= assembler.returnRegisters().size(); q++){
+                for (int q=0; q< assembler.returnRegisters().size(); q++){
                 	if(!registers.contains(assembler.returnRegisters().get(q))){
                 		Register r = new Register(assembler.returnRegisters().get(q), -1);
                 		registers.add(r);
                 	}
                 }
-                System.out.println("Please enter the memory data required for your program in the form (value, address), if no data, enter (no data).");
+                System.out.println("Please enter the memory data required for your program in the form (value, address), if no data, enter (noData).");
                 String[] memData = in.next().split(",");
-                if(!memData[0].equals("no data")){
                 	for(int d=0; d<memData.length; d+=2){
+                		if(!memData[d].equals("noData"))
                 		memory.writeData(memData[d+1], memData[d]);
                 	}
-                }
                 tomasulo.start(registers, icache, cache, memory, pc);
         }
 
