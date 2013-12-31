@@ -1,61 +1,60 @@
 
 public class Units {
-	Cache cache;
+	//Cache cache;
 	
-	public Units(Cache c) {
-		cache = c;
+	//public Units(Cache c) {
+		//cache = c;
+	public Units() {
 	}
 	
-	public int AddSub(String type,Register d,Register s1,Register s2){
+	public int AddSub(String type,Register d,int s1,int s2){
 		if(type.equals("add")){
-			int sum=s1.getValue()+s2.getValue();
+			int sum=s1+s2;
 			d.setValue(sum);
 			return sum;
 		}
 		else{
-		int result=s1.getValue()-s2.getValue();
+		int result=s1-s2;
 		d.setValue(result);
 		return result;
 		}
 		}
 	
-	public int Addi(Register d,Register s1,int value){
-		int sum=s1.getValue()+value;
+	public int Addi(Register d,int s1,int value){
+		int sum=s1+value;
 		d.setValue(sum);
 		return sum;
 		}
 	
-	public int NAND(Register d,Register s1,Register s2){
-		int result=~(s1.getValue()&s2.getValue());
+	public int NAND(Register d,int s1,int s2){
+		int result=~(s1&s2);
 		 d.setValue(result);
 		 return result;
 	} 
 	
-	public int Multiply(Register d,Register s1,Register s2){
-		int result=s1.getValue()*s2.getValue();
+	public int Multiply(Register d,int s1,int s2){
+		int result=s1*s2;
 		d.setValue(result);
 		return result;
 	}
 	
 	
-	public int LoadStore(String type,Memory m,Register a,Register b,int immediate){
-		if(type.equals("load")){
-		int val=immediate+b.getValue();
+	public int Load(Memory m,Register a,int b,int immediate){
+		int val=immediate+b;
 		String address=Integer.toBinaryString(val);
-		cache.read(address, 1);
+		//cache.read(address, 1);
 		String val1=m.readData(address);
 		int value=Integer.parseInt(val1, 2);
 		a.setValue(value);
 		return value;
-		}
-		else{
-			int address=immediate+b.getValue();
-			String add=Integer.toBinaryString(address);
-			cache.read(add, 2);
-			String value=Integer.toBinaryString(a.getValue());
-			m.writeData(add, value);
-			return a.getValue();
-		}
+	}
+	public int Store(Memory m,int a,Register b,int immediate){
+		int address=immediate+b.getValue();
+		String add=Integer.toBinaryString(address);
+		//cache.read(add, 2);
+		String value=Integer.toBinaryString(a);
+		m.writeData(add, value);
+		return a;
 	}
 	
    public void BEQ(Register pc,Register a,Register b,int immediate){
