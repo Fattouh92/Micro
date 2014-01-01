@@ -27,7 +27,7 @@ public class ICache {
 	int miss2=0;
 	int hit3=0;
 	int miss3=0;
-	int cycles = 0;
+	//int cycles = 0;
 	int levels;
 	int index;
 	int tag;
@@ -43,7 +43,7 @@ public class ICache {
 	ArrayList<ActualCache> LevelTwo = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelThree = new ArrayList<ActualCache>();
 	Memory memory;
-
+//m cannot be zero
 	public ICache(int s, int l, int m, int s2, int l2, int m2, int s3, int l3,
 			int m3, int cycles_access_data, int cycles_access_data2,
 			int cycles_access_data3, int cycles_access_memory,
@@ -96,7 +96,8 @@ public class ICache {
 		this.memory = memory;
 	}
 
-	public void read (String address) {  //type=1 read or 2 = write
+	public int read (String address, int type) {  //type=1 read or 2 = write
+		int cycles = 0;
 		cycles += this.cycles_access_data;
 
 		while(address.length() < 16) {
@@ -114,45 +115,70 @@ public class ICache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			hit2++;
+			hit++;
+			if(type == 2 && write_hit_policy == 1) {
+				//queue
+				this.memory_accesses ++;
+			}
+			if(type == 2 && write_hit_policy == 2) {
+				//System.out.println("here");
+				LevelOne.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
+			}
 		} else {
-			miss2++;
+			miss++;
 			if (levels >= 2) {
-				this.readLevelThree(address);
-				if (tempTags.contains(null)) {
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
-					LevelTwo.get(random).getArray()[indexInt][3] = "N";
+				cycles += this.readLevelTwo(address, type);
+				if (type != 2 || write_miss_policy != 2) {
+					if (tempTags.contains(null)) {
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelOne.get(random).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
+							//queue
+							this.memory_accesses++;
+						}
+						LevelOne.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			} else {
-				this.memory_accesses++;
-				if (tempTags.contains(null)) {
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-					LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
-					LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
-					LevelTwo.get(random).getArray()[indexInt][3] = "N";
+				cycles += this.cycles_access_memory;
+				if (type != 2 || write_miss_policy != 2) {
+					System.out.println("no replace");
+					if (tempTags.contains(null)) {
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size());
+						LevelOne.get(random).getArray()[indexInt][0] = tempTag;
+						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
+							//System.out.println("here2");
+							//queue
+							this.memory_accesses++;
+						}
+						LevelOne.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			}
 
 		}
+		System.out.println(this.hit);
+		System.out.println(this.memory_accesses);
+		return cycles;
 	}
 
-	public void readLevelTwo (String address) {
-
-		cycles += this.cycles_access_data2;
+	public int readLevelTwo (String address, int type) {
+		int cycles2 = 0;
+		cycles2 += this.cycles_access_data2;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -168,44 +194,66 @@ public class ICache {
 			tempTags.add(TempTag1);
 		}
 		if (tempTags.contains(tempTag)) {
-			hit++;
+			hit2++;
+			if(type == 2 && write_hit_policy2 == 1) {
+				//queue
+				this.memory_accesses ++;
+			}
+			if(type == 2 && write_hit_policy2 == 2) {
+				LevelTwo.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
+			}
 		} else {
-			miss++;
-			if (levels >= 2) {
-				this.readLevelTwo(address);
-				if (tempTags.contains(null)) {
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelOne.get(random).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
-					LevelOne.get(random).getArray()[indexInt][3] = "N";
+			miss2++;
+
+			if (levels == 3) {
+				cycles2 += this.readLevelThree(address, type);
+				if (type != 2 || write_miss_policy2 != 2) {
+					if (tempTags.contains(null)) {
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
+							//queue
+							this.memory_accesses++;
+						}
+						LevelTwo.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			} else {
-				this.memory_accesses++;
-				if (tempTags.contains(null)) {
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-					LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
-				} else {
-					int random = (int) (Math.random() * tempTags.size()); 
-					LevelOne.get(random).getArray()[indexInt][0] = tempTag;
-					LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
-					LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
-					LevelOne.get(random).getArray()[indexInt][3] = "N";
+				cycles2 += this.cycles_access_memory;
+				if (type != 2 || write_miss_policy2 != 2) {
+					if (tempTags.contains(null)) {
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+					} else {
+						int random = (int) (Math.random() * tempTags.size()); 
+						LevelTwo.get(random).getArray()[indexInt][0] = tempTag;
+						LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
+						LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
+						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
+							//queue
+							this.memory_accesses++;
+						}
+						LevelTwo.get(random).getArray()[indexInt][3] = "N";
+					}
 				}
 			}
-
 		}
+		//System.out.println("2:"+this.hit2);
+		return cycles2;
 	}
 
-	public void readLevelThree(String address) {
-		cycles += this.cycles_access_data3;
+	public int readLevelThree(String address, int type) {
+		int cycles3 = 0;
+		cycles3 += this.cycles_access_data3;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -222,24 +270,48 @@ public class ICache {
 		}
 		if (tempTags.contains(tempTag)) {
 			hit3++;
+			if(type == 2 && write_hit_policy3 == 1) {
+				//queue
+				this.memory_accesses ++;
+			}
+			if(type == 2 && write_hit_policy3 == 2) {
+				LevelThree.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
+			}
 		} else {
+			cycles3 += this.cycles_access_memory;
 			miss3++;
-			this.memory_accesses++;
-			if (tempTags.contains(null)) {
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
-				LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
-			} else {
-				int random = (int) (Math.random() * tempTags.size()); 
-				LevelThree.get(random).getArray()[indexInt][0] = tempTag;
-				LevelThree.get(random).getArray()[indexInt][1] = tempIndex;
-				LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
-				if (LevelThree.get(random).getArray()[indexInt][3].equals("Y")) {
-					this.memory_accesses++;
+			if (type != 2 || write_miss_policy3 != 2) {
+				if (tempTags.contains(null)) {
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][1] = tempIndex;
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][2] = tempOffset;
+					LevelThree.get(tempTags.indexOf(null)).getArray()[indexInt][3] = "N";
+				} else {
+					int random = (int) (Math.random() * tempTags.size()); 
+					LevelThree.get(random).getArray()[indexInt][0] = tempTag;
+					LevelThree.get(random).getArray()[indexInt][1] = tempIndex;
+					LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
+					if (LevelThree.get(random).getArray()[indexInt][3].equals("Y")) {
+						//queue
+						this.memory_accesses++;
+					}
+					LevelThree.get(random).getArray()[indexInt][3] = "N";
 				}
-				LevelThree.get(random).getArray()[indexInt][3] = "N";
 			}
 		}
+		return cycles3;
+	}
+	public static void main(String[]args) {
+		Cache c = new Cache(128, 16, 1, 64, 4, 2, 0, 0,
+				0,  3,  0,
+				 0,  10,
+				 1,  1, 
+				 0, 0,0,0, 2, new Memory());
+		System.out.println("time" + c.read("10000110", 1));
+		System.out.println("time" + c.read("10000110", 1));
+		c.read("10000110", 2);
+		c.read("11010100", 1);
+		//c.read("10", 1);
+		//c.read("", 1);
 	}
 }

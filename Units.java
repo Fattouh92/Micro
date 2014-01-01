@@ -1,12 +1,8 @@
 
 public class Units {
-	//Cache cache;
-	
-	//public Units(Cache c) {
-		//cache = c;
 	public Units() {
 	}
-	
+
 	public int AddSub(String type,Register d,int s1,int s2){
 		if(type.equals("add")){
 			int sum=s1+s2;
@@ -14,35 +10,44 @@ public class Units {
 			return sum;
 		}
 		else{
-		int result=s1-s2;
-		d.setValue(result);
-		return result;
+			int result=s1-s2;
+			d.setValue(result);
+			return result;
 		}
-		}
-	
+	}
+
 	public int Addi(Register d,int s1,int value){
 		int sum=s1+value;
 		d.setValue(sum);
 		return sum;
+	}
+
+	public static int NAND(Register d,int s1,int s2){
+		int result=(s1&s2);
+		String binaryValue = Integer.toBinaryString(result);
+		String tempBinaryValue = "";
+		for (int temp=0; temp<binaryValue.length(); temp++) {
+			if (binaryValue.charAt(temp) == '0') {
+				tempBinaryValue = tempBinaryValue + '1';
+			} else {
+				tempBinaryValue += tempBinaryValue + '0';
+			}
 		}
-	
-	public int NAND(Register d,int s1,int s2){
-		int result=~(s1&s2);
-		 d.setValue(result);
-		 return result;
+		result = Integer.parseInt(tempBinaryValue, 2);
+		d.setValue(result);
+		return result;
 	} 
-	
+
 	public int Multiply(Register d,int s1,int s2){
 		int result=s1*s2;
 		d.setValue(result);
 		return result;
 	}
-	
-	
+
+
 	public int Load(Memory m,Register a,int b,int immediate){
 		int val=immediate+b;
 		String address=Integer.toBinaryString(val);
-		//cache.read(address, 1);
 		String val1=m.readData(address);
 		int value=Integer.parseInt(val1, 2);
 		a.setValue(value);
@@ -51,12 +56,10 @@ public class Units {
 	public int Store(Memory m,int a,Register b,int immediate){
 		int address=immediate+b.getValue();
 		String add=Integer.toBinaryString(address);
-		//cache.read(add, 2);
 		String value=Integer.toBinaryString(a);
 		m.writeData(add, value);
 		return a;
 	}
-	
    public int BEQ(Register pc,int pc2, int a,int b,int immediate){
 	   if(a==b){
 		   int address = pc2+1+immediate;
