@@ -1,9 +1,5 @@
 
 public class Units {
-	//Cache cache;
-
-	//public Units(Cache c) {
-	//cache = c;
 	public Units() {
 	}
 
@@ -38,7 +34,7 @@ public class Units {
 			}
 		}
 		result = Integer.parseInt(tempBinaryValue, 2);
-		//d.setValue(result);
+		d.setValue(result);
 		return result;
 	} 
 
@@ -52,7 +48,6 @@ public class Units {
 	public int Load(Memory m,Register a,int b,int immediate){
 		int val=immediate+b;
 		String address=Integer.toBinaryString(val);
-		//cache.read(address, 1);
 		String val1=m.readData(address);
 		int value=Integer.parseInt(val1, 2);
 		a.setValue(value);
@@ -61,7 +56,6 @@ public class Units {
 	public int Store(Memory m,int a,Register b,int immediate){
 		int address=immediate+b.getValue();
 		String add=Integer.toBinaryString(address);
-		//cache.read(add, 2);
 		String value=Integer.toBinaryString(a);
 		m.writeData(add, value);
 		return a;
