@@ -27,7 +27,7 @@ public class ICache {
 	int miss2=0;
 	int hit3=0;
 	int miss3=0;
-	int cycles = 0;
+	//int cycles = 0;
 	int levels;
 	int index;
 	int tag;
@@ -96,7 +96,8 @@ public class ICache {
 		this.memory = memory;
 	}
 
-	public void read (String address, int type) {  //type=1 read or 2 = write
+	public int read (String address, int type) {  //type=1 read or 2 = write
+		int cycles = 0;
 		cycles += this.cycles_access_data;
 
 		while(address.length() < 16) {
@@ -116,6 +117,7 @@ public class ICache {
 		if (tempTags.contains(tempTag)) {
 			hit++;
 			if(type == 2 && write_hit_policy == 1) {
+				//queue
 				this.memory_accesses ++;
 			}
 			if(type == 2 && write_hit_policy == 2) {
@@ -125,7 +127,7 @@ public class ICache {
 		} else {
 			miss++;
 			if (levels >= 2) {
-				this.readLevelTwo(address, type);
+				cycles += this.readLevelTwo(address, type);
 				if (type != 2 || write_miss_policy != 2) {
 					if (tempTags.contains(null)) {
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
@@ -138,13 +140,14 @@ public class ICache {
 						LevelOne.get(random).getArray()[indexInt][1] = tempIndex;
 						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
 						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
+							//queue
 							this.memory_accesses++;
 						}
 						LevelOne.get(random).getArray()[indexInt][3] = "N";
 					}
 				}
 			} else {
-				this.memory_accesses++;
+				cycles += this.cycles_access_memory;
 				if (type != 2 || write_miss_policy != 2) {
 					System.out.println("no replace");
 					if (tempTags.contains(null)) {
@@ -159,6 +162,7 @@ public class ICache {
 						LevelOne.get(random).getArray()[indexInt][2] = tempOffset;
 						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
 							//System.out.println("here2");
+							//queue
 							this.memory_accesses++;
 						}
 						LevelOne.get(random).getArray()[indexInt][3] = "N";
@@ -169,11 +173,12 @@ public class ICache {
 		}
 		System.out.println(this.hit);
 		System.out.println(this.memory_accesses);
-		
+		return cycles;
 	}
 
-	public void readLevelTwo (String address, int type) {
-		cycles += this.cycles_access_data2;
+	public int readLevelTwo (String address, int type) {
+		int cycles2 = 0;
+		cycles2 += this.cycles_access_data2;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -191,6 +196,7 @@ public class ICache {
 		if (tempTags.contains(tempTag)) {
 			hit2++;
 			if(type == 2 && write_hit_policy2 == 1) {
+				//queue
 				this.memory_accesses ++;
 			}
 			if(type == 2 && write_hit_policy2 == 2) {
@@ -200,7 +206,7 @@ public class ICache {
 			miss2++;
 
 			if (levels == 3) {
-				this.readLevelThree(address, type);
+				cycles2 += this.readLevelThree(address, type);
 				if (type != 2 || write_miss_policy2 != 2) {
 					if (tempTags.contains(null)) {
 						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
@@ -213,13 +219,14 @@ public class ICache {
 						LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
 						LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
 						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
+							//queue
 							this.memory_accesses++;
 						}
 						LevelTwo.get(random).getArray()[indexInt][3] = "N";
 					}
 				}
 			} else {
-				this.memory_accesses++;
+				cycles2 += this.cycles_access_memory;
 				if (type != 2 || write_miss_policy2 != 2) {
 					if (tempTags.contains(null)) {
 						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
@@ -232,6 +239,7 @@ public class ICache {
 						LevelTwo.get(random).getArray()[indexInt][1] = tempIndex;
 						LevelTwo.get(random).getArray()[indexInt][2] = tempOffset;
 						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
+							//queue
 							this.memory_accesses++;
 						}
 						LevelTwo.get(random).getArray()[indexInt][3] = "N";
@@ -239,11 +247,13 @@ public class ICache {
 				}
 			}
 		}
-		System.out.println("2:"+this.hit2);
+		//System.out.println("2:"+this.hit2);
+		return cycles2;
 	}
 
-	public void readLevelThree(String address, int type) {
-		cycles += this.cycles_access_data3;
+	public int readLevelThree(String address, int type) {
+		int cycles3 = 0;
+		cycles3 += this.cycles_access_data3;
 		while(address.length() < 16) {
 			address = "0" + address;
 		}
@@ -261,13 +271,14 @@ public class ICache {
 		if (tempTags.contains(tempTag)) {
 			hit3++;
 			if(type == 2 && write_hit_policy3 == 1) {
+				//queue
 				this.memory_accesses ++;
 			}
 			if(type == 2 && write_hit_policy3 == 2) {
 				LevelThree.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
 			}
 		} else {
-			this.memory_accesses++;
+			cycles3 += this.cycles_access_memory;
 			miss3++;
 			if (type != 2 || write_miss_policy3 != 2) {
 				if (tempTags.contains(null)) {
@@ -281,20 +292,23 @@ public class ICache {
 					LevelThree.get(random).getArray()[indexInt][1] = tempIndex;
 					LevelThree.get(random).getArray()[indexInt][2] = tempOffset;
 					if (LevelThree.get(random).getArray()[indexInt][3].equals("Y")) {
+						//queue
 						this.memory_accesses++;
 					}
 					LevelThree.get(random).getArray()[indexInt][3] = "N";
 				}
 			}
 		}
+		return cycles3;
 	}
 	public static void main(String[]args) {
-		ICache c = new ICache(128, 16, 1, 64, 4, 2, 0, 0,
+		Cache c = new Cache(128, 16, 1, 64, 4, 2, 0, 0,
 				0,  3,  0,
-				 0,  100,
+				 0,  10,
 				 1,  1, 
 				 0, 0,0,0, 2, new Memory());
-		c.read("10000110", 1);
+		System.out.println("time" + c.read("10000110", 1));
+		System.out.println("time" + c.read("10000110", 1));
 		c.read("10000110", 2);
 		c.read("11010100", 1);
 		//c.read("10", 1);
