@@ -57,25 +57,29 @@ public class Units {
 		return a;
 	}
 	
-   public void BEQ(Register pc,Register a,Register b,int immediate){
-	   if(a.getValue()==b.getValue()){
-		   int address = pc.getValue()+1+immediate;
+   public int BEQ(Register pc,int pc2, int a,int b,int immediate){
+	   if(a==b){
+		   int address = pc2+1+immediate;
 		   pc.setValue(address);
 	   }
+	   return pc.getValue();
    }
    
-   public void jump(Register pc,Register a,int immediate){
-	   int address=pc.getValue()+1+a.getValue()+immediate;
+   public int jump(Register pc,int pc2, int a,int immediate){
+	   int address=pc2+1+a+immediate;
 	   pc.setValue(address);
+	   return address;
    }
    
-   public void Jalr(Register pc,Register a,Register b){
-	   a.setValue(pc.getValue()+1);
-	   pc.setValue(b.getValue());
+   public int Jalr(Register pc,int pc2, Register a,int b){
+	   a.setValue(pc2+1);
+	   pc.setValue(b);
+	   return a.getValue();
    }
    
-   public void Return(Register a,Register pc){
-	   pc.setValue(a.getValue());
+   public int Return(int a,Register pc){
+	   pc.setValue(a);
+	   return a;
    }
    
    public void CommitOP(int value,Register d){
