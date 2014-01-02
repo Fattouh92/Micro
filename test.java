@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 
-
 public class test {
-	public static void main(String[]args) {
+	@SuppressWarnings("unused")
+	public static void main(String[] args) {
 		ArrayList<String> tempTags = new ArrayList<String>();
 		tempTags.add(null);
 		tempTags.add(null);

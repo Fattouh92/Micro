@@ -4,6 +4,7 @@ public class Queue {
 	private int front;
 	private int rear;
 	private int nItems;
+
 	// constructor
 	public Queue(int s) {
 		maxSize = s; // set array size
@@ -12,33 +13,40 @@ public class Queue {
 		rear = -1;
 		nItems = 0; // no items yet
 	} // end of constructor
+
 	public void enqueue(String i) {
 		if (rear == maxSize - 1)
-		rear = -1;
+			rear = -1;
 		queArray[++rear] = i; // increment rear, insert item
 		nItems++;
 	}
+
 	public String dequeue() {
 		String result = queArray[front]; // get value
 		front++; // increment front
 		if (front == maxSize) // deal with wraparound
-		front = 0;
+			front = 0;
 		nItems--;
 		return result;
 	}
+
 	public String peek() {
 		return queArray[front];
 	}
+
 	public boolean isEmpty() {
 		return (nItems == 0);
 	}
+
 	public boolean isFull() {
 		return (nItems == maxSize);
 	}
+
 	public int size() {
 		return nItems;
 	}
-	public String get(int index){
+
+	public String get(int index) {
 		return queArray[index];
 	}
 }
