@@ -51,8 +51,8 @@ public class Units {
 		return value;
 	}
 
-	public int Store(Memory m, int a, Register b, int immediate) {
-		int address = immediate + b.getValue();
+	public int Store(Memory m, int a, int b, int immediate) {
+		int address = immediate + b;
 		String add = Integer.toBinaryString(address);
 		String value = Integer.toBinaryString(a);
 		m.writeData(add, value);
