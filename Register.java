@@ -1,4 +1,3 @@
-
 public class Register {
 	String name;
 	int value;
@@ -23,5 +22,3 @@ public class Register {
 	}
 
 }
-
-
