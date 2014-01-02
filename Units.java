@@ -22,7 +22,7 @@ public class Units {
 		return sum;
 	}
 
-	public static int NAND(Register d,int s1,int s2){
+	public int NAND(Register d,int s1,int s2){
 		int result=(s1&s2);
 		String binaryValue = Integer.toBinaryString(result);
 		String tempBinaryValue = "";

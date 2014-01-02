@@ -65,7 +65,7 @@ public class TomasuloAlg {
 		}
 		//String ins = memory.readData(Integer.toBinaryString(pc.getValue()));
 		//iCache.read(Integer.toBinaryString(pc.getValue()));
-		String ins = mem[pc.getValue()];
+		String ins = "";
 		boolean addIns = true;
 		int counter = 30;
 		//while (!(ins.equals("null") && rob.isEmpty())){
@@ -79,6 +79,11 @@ public class TomasuloAlg {
 					if (!loadStoreRs.isEmpty()){
 						for(int i=0;i<loadStoreRs.size();i++){
 							String[] temp = loadStoreRs.get(i);
+							if (!temp[2].equals("")){
+								int rem = Integer.parseInt(temp[2]);
+								rem--;
+								temp[2] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[3]);
 							rem--;
 							temp[3] = Integer.toString(rem);
@@ -88,6 +93,16 @@ public class TomasuloAlg {
 					if (!addSubRs.isEmpty()){
 						for(int i=0;i<addSubRs.size();i++){
 							String[] temp = addSubRs.get(i);
+							if (!temp[3].equals("")){
+								int rem = Integer.parseInt(temp[3]);
+								rem--;
+								temp[3] = Integer.toString(rem);
+							}
+							if (!temp[4].equals("")){
+								int rem = Integer.parseInt(temp[4]);
+								rem--;
+								temp[4] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[5]);
 							rem--;
 							temp[5] = Integer.toString(rem);
@@ -97,6 +112,16 @@ public class TomasuloAlg {
 					if (!nandRs.isEmpty()){
 						for(int i=0;i<nandRs.size();i++){
 							String[] temp = nandRs.get(i);
+							if (!temp[3].equals("")){
+								int rem = Integer.parseInt(temp[3]);
+								rem--;
+								temp[3] = Integer.toString(rem);
+							}
+							if (!temp[4].equals("")){
+								int rem = Integer.parseInt(temp[4]);
+								rem--;
+								temp[4] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[5]);
 							rem--;
 							temp[5] = Integer.toString(rem);
@@ -106,6 +131,16 @@ public class TomasuloAlg {
 					if (!multRs.isEmpty()){
 						for(int i=0;i<multRs.size();i++){
 							String[] temp = multRs.get(i);
+							if (!temp[3].equals("")){
+								int rem = Integer.parseInt(temp[3]);
+								rem--;
+								temp[3] = Integer.toString(rem);
+							}
+							if (!temp[4].equals("")){
+								int rem = Integer.parseInt(temp[4]);
+								rem--;
+								temp[4] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[5]);
 							rem--;
 							temp[5] = Integer.toString(rem);
@@ -115,6 +150,11 @@ public class TomasuloAlg {
 					if (!addiRs.isEmpty()){
 						for(int i=0;i<addiRs.size();i++){
 							String[] temp = addiRs.get(i);
+							if (!temp[2].equals("")){
+								int rem = Integer.parseInt(temp[2]);
+								rem--;
+								temp[2] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[3]);
 							rem--;
 							temp[3] = Integer.toString(rem);
@@ -124,6 +164,11 @@ public class TomasuloAlg {
 					if (!jmpJalrRetRs.isEmpty()){
 						for(int i=0;i<jmpJalrRetRs.size();i++){
 							String[] temp = jmpJalrRetRs.get(i);
+							if (!temp[3].equals("")){
+								int rem = Integer.parseInt(temp[3]);
+								rem--;
+								temp[3] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[4]);
 							rem--;
 							temp[4] = Integer.toString(rem);
@@ -133,6 +178,16 @@ public class TomasuloAlg {
 					if (!beqRs.isEmpty()){
 						for(int i=0;i<beqRs.size();i++){
 							String[] temp = beqRs.get(i);
+							if (!temp[4].equals("")){
+								int rem = Integer.parseInt(temp[4]);
+								rem--;
+								temp[4] = Integer.toString(rem);
+							}
+							if (!temp[5].equals("")){
+								int rem = Integer.parseInt(temp[5]);
+								rem--;
+								temp[5] = Integer.toString(rem);
+							}
 							int rem = Integer.parseInt(temp[6]);
 							rem--;
 							temp[6] = Integer.toString(rem);
@@ -147,7 +202,7 @@ public class TomasuloAlg {
 					if (rob.peek()[3].equals("O")){
 						fu.CommitOP(Integer.parseInt(rob.peek()[0]), getRegOrg(regs, rob.peek()[2]));
 					}
-					else{
+					else if (rob.peek()[3].equals("S")){
 						String[] split =  rob.peek()[2].split(" ");
 						String address = split[0];
 						String offset = split[1];
@@ -159,7 +214,9 @@ public class TomasuloAlg {
 			for (int i = 0; i < ib.size(); i++){
 				
 				if (ib.get(i,1).equals("")){
+					System.out.println("hi2");
 					String op = checkOp(ib.get(i,0));
+					System.out.println(op);
 					String[] regsVal = getRegs(op, ib.get(i,0));
 					if (!rob.isFull()){
 						switch (op) { 
@@ -190,8 +247,6 @@ public class TomasuloAlg {
 						        	String[] robRec = {"", "N", regsVal[1] + " " + regsVal[2], "S"};
 						        	rob.enqueue(robRec);
 						        	ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-						        	int regIndex = getRegIndex(regs, regsVal[1]);
-						        	regTable[regIndex] = rob.nItems - 1;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[0]);
 						        	String[] entry;
 						        	if (valid){
@@ -302,6 +357,7 @@ public class TomasuloAlg {
 						        }
 							  break;
 							case "jmp":
+								System.out.println("hi");
 								if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
 									ib.modify(i, 1, "issued");
 						        	String[] robRec = {"", "N", "pc", "J"};
@@ -347,7 +403,7 @@ public class TomasuloAlg {
 							case "jalr":
 								if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
 									ib.modify(i, 1, "issued");
-						        	String[] robRec = {"", "N", "pc " + regsVal[0], "J"};
+						        	String[] robRec = {"", "N", regsVal[0], "O"};
 						        	rob.enqueue(robRec);
 									ib.modify(i, 2, Integer.toString(rob.nItems - 1));
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
@@ -423,10 +479,12 @@ public class TomasuloAlg {
 							for (int k = 0; k < addSubRs.size(); k++){
 								if (addSubRs.get(k)[5].equals(ib.get(i, 2))){
 									index = k;
+									System.out.println("index: " + index);
 								}
 							}
 							if (addSubRs.get(index)[6].equals(Integer.toString(0))){
 								ib.modify(i, 1, "executed");
+								System.out.println("i: " + i + addSubRs.get(index)[6]);
 							}
 							else if (addSubRs.get(index)[3].equals("") && addSubRs.get(index)[4].equals("")){
 								String[] temp = addSubRs.get(index);
@@ -673,6 +731,7 @@ public class TomasuloAlg {
 					for (int j = 0; j < rob.size(); j++){
 						if (rob.get(j, 3).equals("B")){
 							bindex = j;
+							System.out.println("bindex: " + bindex);
 						}
 					}
 					if (canWrite || (!canWrite && Integer.parseInt(ib.get(i, 2)) <= bindex)){
@@ -686,6 +745,9 @@ public class TomasuloAlg {
 								result = fu.Load(memory, getRegOrg(regs, regsVal[0]), Integer.parseInt(loadStoreRs.get(index)[1]), Integer.parseInt(regsVal[2]));
 								rob.modify(Integer.parseInt(loadStoreRs.get(index)[3]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(loadStoreRs.get(index)[3]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								loadStoreRs.remove(index);
 								ib.modify(i, 1, "written");
 								break;
@@ -712,6 +774,9 @@ public class TomasuloAlg {
 								result = fu.AddSub(op, getRegOrg(regs, regsVal[0]), Integer.parseInt(addSubRs.get(index)[1]), Integer.parseInt(addSubRs.get(index)[2]));
 								rob.modify(Integer.parseInt(addSubRs.get(index)[5]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(addSubRs.get(index)[5]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								addSubRs.remove(index);
 								ib.modify(i, 1, "written");
 								break;
@@ -725,6 +790,9 @@ public class TomasuloAlg {
 								System.out.println("nand index: " + index + " " + result + " " + nandRs.get(index)[5]);
 								rob.modify(Integer.parseInt(nandRs.get(index)[5]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(nandRs.get(index)[5]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								nandRs.remove(index);
 								ib.modify(i, 1, "written");
 								break;
@@ -737,6 +805,9 @@ public class TomasuloAlg {
 								result = fu.Multiply(getRegOrg(regs, regsVal[0]), Integer.parseInt(multRs.get(index)[1]), Integer.parseInt(multRs.get(index)[2]));
 								rob.modify(Integer.parseInt(multRs.get(index)[5]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(multRs.get(index)[5]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								multRs.remove(index);
 								ib.modify(i, 1, "written");
 								break;
@@ -749,6 +820,9 @@ public class TomasuloAlg {
 								result = fu.Addi(getRegOrg(regs, regsVal[0]), Integer.parseInt(addiRs.get(index)[1]), Integer.parseInt(regsVal[2]));
 								rob.modify(Integer.parseInt(addiRs.get(index)[3]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(addiRs.get(index)[3]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								addiRs.remove(index);
 								ib.modify(i, 1, "written");
 								break;
@@ -761,6 +835,9 @@ public class TomasuloAlg {
 								result = fu.jump(pc, Integer.parseInt(jmpJalrRetRs.get(index)[2]), Integer.parseInt(jmpJalrRetRs.get(index)[1]), Integer.parseInt(regsVal[1]));
 								rob.modify(Integer.parseInt(jmpJalrRetRs.get(index)[4]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(jmpJalrRetRs.get(index)[4]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								jmpJalrRetRs.remove(index);
 								ib.modify(i, 1, "written");
 								addIns = true;
@@ -772,7 +849,7 @@ public class TomasuloAlg {
 									}
 								}
 								int pc3 = pc.getValue();
-								result = fu.BEQ(pc, Integer.parseInt(beqRs.get(index)[3]), Integer.parseInt(multRs.get(index)[1]), Integer.parseInt(multRs.get(index)[2]), Integer.parseInt(regsVal[2]));
+								result = fu.BEQ(pc, Integer.parseInt(beqRs.get(index)[3]), Integer.parseInt(beqRs.get(index)[1]), Integer.parseInt(beqRs.get(index)[2]), Integer.parseInt(regsVal[2]));
 								if (result != pc3){
 									for(int a = 0; a < loadStoreRs.size(); a++){
 										if(Integer.parseInt(loadStoreRs.get(a)[3]) > bindex){
@@ -780,8 +857,10 @@ public class TomasuloAlg {
 										}
 									}
 									for(int a = 0; a < addSubRs.size(); a++){
+										System.out.println("addSub: " + addSubRs.get(a)[5]);
 										if(Integer.parseInt(addSubRs.get(a)[5]) > bindex){
 											addSubRs.remove(a);
+											//System.out.println("addSub: " + addSubRs.get(a)[5]);
 										}
 									}
 									for(int a = 0; a < nandRs.size(); a++){
@@ -824,6 +903,9 @@ public class TomasuloAlg {
 								}
 								rob.modify(Integer.parseInt(beqRs.get(index)[6]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(beqRs.get(index)[6]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								beqRs.remove(index);
 								ib.modify(i, 1, "written");
 								canWrite = true;
@@ -837,6 +919,9 @@ public class TomasuloAlg {
 								result = fu.Jalr(pc, Integer.parseInt(jmpJalrRetRs.get(index)[2]), getRegOrg(regs, regsVal[0]), Integer.parseInt(jmpJalrRetRs.get(index)[1]));
 								rob.modify(Integer.parseInt(jmpJalrRetRs.get(index)[4]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(jmpJalrRetRs.get(index)[4]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								jmpJalrRetRs.remove(index);
 								ib.modify(i, 1, "written");
 								addIns = true;
@@ -850,6 +935,9 @@ public class TomasuloAlg {
 								result = fu.Return(Integer.parseInt(jmpJalrRetRs.get(index)[1]), pc);
 								rob.modify(Integer.parseInt(jmpJalrRetRs.get(index)[4]), 0, Integer.toString(result));
 								rob.modify(Integer.parseInt(jmpJalrRetRs.get(index)[4]), 1, "Y");
+								if (regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] == Integer.parseInt(ib.get(i, 2))){
+									regTable[getRegIndex(regs, rob.get(Integer.parseInt(ib.get(i, 2)), 2))] = -1;
+								}
 								jmpJalrRetRs.remove(index);
 								ib.modify(i, 1, "written");
 								addIns = true;
@@ -861,21 +949,24 @@ public class TomasuloAlg {
 				}
 				
 			}
-			
-			
-			
-			
-			if (addIns){
-				String[] insa = {ins, "", ""};
-				ib.enqueue(insa);
-				
-				//System.out.println("cycles: " + cycles);
-				//System.out.println("ib: ");
-				//printing(ib, 3);
-				
-			}
-			
 
+			
+			
+			if (!ib.isFull() && addIns){
+				//ins = memory.readData(Integer.toBinaryString(pc.getValue()));
+				//iCache.read(Integer.toBinaryString(pc.getValue()));
+				ins = mem[pc.getValue()];
+				if (!ins.equals("null")){
+					String[] insa = {ins, "", ""};
+					ib.enqueue(insa);
+				}
+				else{
+					addIns = false;
+				}
+				//pc.setValue((pc.getValue() + 2));
+				pc.setValue((pc.getValue() + 1));
+			}
+			counter--;
 			System.out.println("cycles: " + cycles);
 			System.out.println("ib: ");
 			printing(ib, 3);
@@ -889,26 +980,9 @@ public class TomasuloAlg {
 			printingA(addSubRs, 7);
 			System.out.println("nand rs: ");
 			printingA(nandRs, 7);
+			System.out.println("jmpJalrRet rs: ");
+			printingA(jmpJalrRetRs, 6);
 			System.out.println();
-			
-			
-			if (!ib.isFull() && addIns){
-				//pc.setValue((pc.getValue() + 2));
-				pc.setValue((pc.getValue() + 1));
-				//ins = memory.readData(Integer.toBinaryString(pc.getValue()));
-				//iCache.read(Integer.toBinaryString(pc.getValue()));
-				ins = mem[pc.getValue()];
-				if (!ins.equals("null")){
-					addIns = true;
-				}
-				else{
-					addIns = false;
-				}
-			}
-			else{
-				addIns = false;
-			}
-			counter--;
 		}
 	}
 	
@@ -919,8 +993,12 @@ public class TomasuloAlg {
 		String[] s = new String[3];
 		String[] split = ins.split(" ");
 		s[0] = split[1];
-		s[1] = split[2];
-		s[2] = split[3];
+		if (!op.equals("ret")){
+			s[1] = split[2];
+			if (!op.equals("jmp") && !op.equals("jalr")){
+				s[2] = split[3];
+			}
+		}
 		return s;
 	}
 	public boolean freeDest(ArrayList<Register> regs, int[] regTable, String destReg){
@@ -976,7 +1054,7 @@ public class TomasuloAlg {
 		System.out.println();
 	}
 	public static void main(String [] args){
-		TomasuloAlg t = new TomasuloAlg(2, 5, 2, 2, 2, 0, 0, 0, 8, 1, 2, 12, 6, 2, 0, 0);
+		TomasuloAlg t = new TomasuloAlg(8, 5, 2, 2, 2, 2, 1, 2, 8, 1, 2, 12, 6, 2, 2, 2);
 		Register F6 = new Register("F6", 1);
 		Register R2 = new Register("R2", 1);
 		Register F2 = new Register("F2", 1);
@@ -985,6 +1063,7 @@ public class TomasuloAlg {
 		Register F4 = new Register("F4", 1);
 		Register F8 = new Register("F8", 1);
 		Register F10 = new Register("F10", 1);
+		Register F16 = new Register("F16", 2);
 		Register pc = new Register("pc", 0);
 		ArrayList<Register> regs = new ArrayList<Register>();
 		regs.add(F6);
@@ -995,8 +1074,9 @@ public class TomasuloAlg {
 		regs.add(F4);
 		regs.add(F8);
 		regs.add(F10);
+		regs.add(F16);
 		regs.add(pc);
-		String[] mem = {"mult F0 F2 F4", "sub F8 F2 F6", "nand F10 F0 F6", "add F6 F8 F2", "null"};
+		String[] mem = {"sub F8 F2 F6","beq F2 F4 0", "nand F10 F0 F6", "add F6 F8 F2", "null"};
 		t.start(regs, mem, pc);
 	}
 	
