@@ -12,7 +12,6 @@ public class Micro {
 	static ICache icache;
 	static TomasuloAlg tomasulo;
 	static Assembler assembler = new Assembler();
-	static Register pc = new Register("pc", 0);
 
 	@SuppressWarnings("resource")
 	public static void startSimulation() throws NumberFormatException,
@@ -209,7 +208,9 @@ public class Micro {
 						+ "add/sub cycles,"
 						+ "nand cycles,"
 						+ "mul cycles,"
-						+ "addi cycles");
+						+ "addi cycles"
+						+ "jmp/jlr/ret cycles"
+						+ "beq cycles");
 		String[] tomasuloSpecifications = in.next().split(",");
 		tomasulo = new TomasuloAlg(Integer.parseInt(tomasuloSpecifications[0]),
 				Integer.parseInt(tomasuloSpecifications[1]),
@@ -252,6 +253,7 @@ public class Micro {
 			if (!memData[d].equals("noData"))
 				memory.writeData(memData[d + 1], memData[d]);
 		}
+		Register pc = new Register("pc", 0);
 		tomasulo.start(registers, icache, cache, memory, pc);
 		System.out.println("Number of cycles: " + tomasulo.cycles);
 		System.out.println("IPC: " + (instructions.length / tomasulo.cycles));

@@ -27,10 +27,6 @@ public class Assembler {
 			while ((content = fis.read()) != -1) {
 				if (content == 10) {
 					String[] instruction = result[instructionNumber].split(" ");
-					for (int i = 0; i < instruction.length; i++) {
-
-						System.out.println(instruction[i]);
-					}
 					switch (instruction[0]) {
 
 					case "load":
@@ -85,6 +81,9 @@ public class Assembler {
 					}
 					instructionNumber++;
 				} else {
+					if(result[instructionNumber] == null)
+						result[instructionNumber] = (char) content+"";
+					else
 					result[instructionNumber] += (char) content;
 				}
 			}
