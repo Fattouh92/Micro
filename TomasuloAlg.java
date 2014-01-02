@@ -18,6 +18,7 @@ public class TomasuloAlg {
 	ArrayList<String[]> jmpJalrRetRs;
 	int jmpJalrRetRsSize;
 	ArrayList<String[]> beqRs;
+	int timeForFetch;
 	int beqRsSize;
 	int loadCyc;
 	int storeCyc;
@@ -61,7 +62,6 @@ public class TomasuloAlg {
 		canWrite = true;
 		iBreak = false;
 	}
-
 	public void start(ArrayList<Register> regs, ICache iCache, Cache cache, Memory memory, Register pc){
 	//public void start(ArrayList<Register> regs, String[] mem, Register pc){
 		//Units fu = new Units(cache);
@@ -75,7 +75,7 @@ public class TomasuloAlg {
 		//iCache.read(Integer.toBinaryString(pc.getValue()));
 		String ins = "";
 		boolean addIns = true;
-		int counter = 30;
+		//int counter = 30;
 		while (!(ins.equals("null") && rob.isEmpty())){
 		//while (counter > 0){
 			cycles++;
@@ -251,7 +251,6 @@ public class TomasuloAlg {
 					String[] regsVal = getRegs(op, ib.get(i,0));
 					if (!rob.isFull()){
 						switch (op) { 
-
 						case "load":
 							if (loadRs.size()<loadRsSize){
 								ib.modify(i, 1, "issued");
@@ -289,192 +288,192 @@ public class TomasuloAlg {
 								storeRs.add(entry);
 							}
 							break;
-						case "add":
-						case "sub":
-							if (addSubRs.size() < addSubRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", regsVal[0], "O"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								int regIndex = getRegIndex(regs, regsVal[0]);
-								regTable[regIndex] = rob.nItems - 1;
-								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
-								boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
-								String[] entry;
-								if (valid && valid2){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(addSubCyc)};
-								}
-								else if(valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(addSubCyc)};
-								}
-								else if(valid2){
-									entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(addSubCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(addSubCyc)};
-								}
-								addSubRs.add(entry);
-							}
-							break;
-						case "nand":
-							if (nandRs.size()<nandRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", regsVal[0], "O"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								int regIndex = getRegIndex(regs, regsVal[0]);
-								regTable[regIndex] = rob.nItems - 1;
-								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
-								boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
-								String[] entry;
-								if (valid && valid2){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(nandCyc)};
-								}
-								else if(valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(nandCyc)};
-								}
-								else if(valid2){
-									entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(nandCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(nandCyc)};
-								}
-								nandRs.add(entry);
-							}
-							break;
-						case "mult":
-							if (multRs.size()<multRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", regsVal[0], "O"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								int regIndex = getRegIndex(regs, regsVal[0]);
-								regTable[regIndex] = rob.nItems - 1;
-								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
-								boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
-								String[] entry;
-								if (valid && valid2){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(multCyc)};
-								}
-								else if(valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(multCyc)};
-								}
-								else if(valid2){
-									entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(multCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(multCyc)};
-								}
-								multRs.add(entry);
-							}
-							break;
-						case "addi":
-							if (addiRs.size()<addiRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", regsVal[0], "O"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								int regIndex = getRegIndex(regs, regsVal[0]);
-								regTable[regIndex] = rob.nItems - 1;
-								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
-								String[] entry;
-								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(addiCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(addiCyc)};
-								}
-								addiRs.add(entry);
-							}
-							break;
-						case "jmp":
-							//System.out.println("hi");
-							if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", "pc", "J"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								boolean valid = this.freeDest(regs, regTable, regsVal[0]);
-								String[] entry;
-								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
-								}
-								jmpJalrRetRs.add(entry);
-								addIns = false;
-							}
-							break;
-						case "beq":
-							if (beqRs.size()<beqRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", "pc", "B"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								boolean valid = this.freeDest(regs, regTable, regsVal[0]);
-								boolean valid2 = this.freeDest(regs, regTable, regsVal[1]);
-								String[] entry;
-								if (valid && valid2){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(beqCyc)};
-								}
-								else if(valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), "", Integer.toString(pc.getValue()), "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1) , Integer.toString(beqCyc)};
-								}
-								else if(valid2){
-									entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(beqCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1) , Integer.toString(beqCyc)};
-								}
-								beqRs.add(entry);
-								canWrite = false;
-							}
-							break;
-						case "jalr":
-							if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", regsVal[0], "O"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								int regIndex = getRegIndex(regs, regsVal[0]);
-								regTable[regIndex] = rob.nItems - 1;
-								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
-								String[] entry;
-								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
-								}
-								jmpJalrRetRs.add(entry);
-								addIns = false;
-							}
-							break;
-						case "ret":
-							if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
-								ib.modify(i, 1, "issued");
-								String[] robRec = {"", "N", "pc", "J"};
-								rob.enqueue(robRec);
-								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
-								boolean valid = this.freeDest(regs, regTable, regsVal[0]);
-								String[] entry;
-								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
-								}
-								else{
-									entry = new String[]{"Y", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
-								}
-								jmpJalrRetRs.add(entry);
-								addIns = false;
-							}
-							break;
-						default:
-							break;
+							case "add":
+							case "sub":
+								if (addSubRs.size() < addSubRsSize){
+						        	ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", regsVal[0], "O"};
+						        	rob.enqueue(robRec);
+						        	ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	int regIndex = getRegIndex(regs, regsVal[0]);
+						        	regTable[regIndex] = rob.nItems - 1;
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
+						        	String[] entry;
+						        	if (valid && valid2){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(addSubCyc)};
+						        	}
+						        	else if(valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(addSubCyc)};
+						        	}
+						        	else if(valid2){
+						        		entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(addSubCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(addSubCyc)};
+						        	}
+						        	addSubRs.add(entry);
+						        }
+							  break;
+							case "nand":
+								if (nandRs.size()<nandRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", regsVal[0], "O"};
+						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	int regIndex = getRegIndex(regs, regsVal[0]);
+						        	regTable[regIndex] = rob.nItems - 1;
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
+						        	String[] entry;
+						        	if (valid && valid2){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(nandCyc)};
+						        	}
+						        	else if(valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(nandCyc)};
+						        	}
+						        	else if(valid2){
+						        		entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(nandCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(nandCyc)};
+						        	}
+						        	nandRs.add(entry);
+						        }
+							  break;
+							case "mult":
+								if (multRs.size()<multRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", regsVal[0], "O"};
+						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	int regIndex = getRegIndex(regs, regsVal[0]);
+						        	regTable[regIndex] = rob.nItems - 1;
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
+						        	String[] entry;
+						        	if (valid && valid2){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(multCyc)};
+						        	}
+						        	else if(valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(multCyc)};
+						        	}
+						        	else if(valid2){
+						        		entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(multCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(regTable[getRegIndex(regs, regsVal[2])]), Integer.toString(rob.nItems - 1) , Integer.toString(multCyc)};
+						        	}
+						        	multRs.add(entry);
+						        }
+							  break;
+							case "addi":
+								if (addiRs.size()<addiRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", regsVal[0], "O"};
+						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	int regIndex = getRegIndex(regs, regsVal[0]);
+						        	regTable[regIndex] = rob.nItems - 1;
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	String[] entry;
+						        	if (valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(addiCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(addiCyc)};
+						        	}
+						        	addiRs.add(entry);
+						        }
+							  break;
+							case "jmp":
+								//System.out.println("hi");
+								if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", "pc", "J"};
+						        	rob.enqueue(robRec);
+						        	ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[0]);
+						        	String[] entry;
+						        	if (valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
+						        	}
+						        	jmpJalrRetRs.add(entry);
+						        	addIns = false;
+						        }
+							  break;
+							case "beq":
+								if (beqRs.size()<beqRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", "pc", "B"};
+						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[0]);
+						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[1]);
+						        	String[] entry;
+						        	if (valid && valid2){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(beqCyc)};
+						        	}
+						        	else if(valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), "", Integer.toString(pc.getValue()), "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1) , Integer.toString(beqCyc)};
+						        	}
+						        	else if(valid2){
+						        		entry = new String[]{"Y", "", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), "", Integer.toString(rob.nItems - 1) , Integer.toString(beqCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1) , Integer.toString(beqCyc)};
+						        	}
+						        	beqRs.add(entry);
+						        	canWrite = false;
+						        }
+							  break;
+							case "jalr":
+								if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", regsVal[0], "O"};
+						        	rob.enqueue(robRec);
+									ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	int regIndex = getRegIndex(regs, regsVal[0]);
+						        	regTable[regIndex] = rob.nItems - 1;
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	String[] entry;
+						        	if (valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
+						        	}
+						        	jmpJalrRetRs.add(entry);
+						        	addIns = false;
+						        }
+							  break;
+							case "ret":
+								if (jmpJalrRetRs.size()<jmpJalrRetRsSize){
+									ib.modify(i, 1, "issued");
+						        	String[] robRec = {"", "N", "pc", "J"};
+						        	rob.enqueue(robRec);
+						        	ib.modify(i, 2, Integer.toString(rob.nItems - 1));
+						        	boolean valid = this.freeDest(regs, regTable, regsVal[0]);
+						        	String[] entry;
+						        	if (valid){
+						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
+						        	}
+						        	else{
+						        		entry = new String[]{"Y", "", Integer.toString(pc.getValue()), Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
+						        	}
+						        	jmpJalrRetRs.add(entry);
+						        	addIns = false;
+						        }
+							  break;
+							default:
+							  break;
 						}
 					}
 				}
-
+						
 				else if(ib.get(i,1).equals("issued")){
 					String op = checkOp(ib.get(i,0));
 					int index = 0;
@@ -817,14 +816,14 @@ public class TomasuloAlg {
 							storeRs.remove(index);
 							ib.modify(i, 1, "written");
 							break;
-						case "add":
-						case "sub":
-							for (int k = 0; k < addSubRs.size(); k++){
-								if (addSubRs.get(k)[5].equals(ib.get(i, 2))){
-									index = k;
-									//System.out.println(index);
+							case "add":
+							case "sub":
+								for (int k = 0; k < addSubRs.size(); k++){
+									if (addSubRs.get(k)[5].equals(ib.get(i, 2))){
+										index = k;
+										//System.out.println(index);
+									}
 								}
-							}
 							result = fu.AddSub(op, getRegOrg(regs, regsVal[0]), Integer.parseInt(addSubRs.get(index)[1]), Integer.parseInt(addSubRs.get(index)[2]));
 							rob.modify(Integer.parseInt(addSubRs.get(index)[5]), 0, Integer.toString(result));
 							rob.modify(Integer.parseInt(addSubRs.get(index)[5]), 1, "Y");
@@ -1015,20 +1014,37 @@ public class TomasuloAlg {
 
 
 			if (!ib.isFull() && addIns){
-				ins = memory.readData(Integer.toBinaryString(pc.getValue()));
-				iCache.read(Integer.toBinaryString(pc.getValue()), 1);
-				//ins = mem[pc.getValue()];
-				if (!ins.equals("null")){
-					String[] insa = {ins, "", ""};
-					ib.enqueue(insa);
+				//ins = memory.readData(Integer.toBinaryString(pc.getValue()));
+				//iCache.read(Integer.toBinaryString(pc.getValue()));
+				try {
+					if (timeForFetch == 0) {
+						if (!ins.equals("null")){
+							if (ins.length() != 0) {
+								String[] insa = {ins, "", ""};
+								ib.enqueue(insa);
+							}
+						}
+						else {
+							addIns = false;
+						}
+						pc.setValue((pc.getValue() + 2));
+						ins = memory.readData(pc.getValue()+"");
+						//System.out.println(pc.getValue()+"");
+						timeForFetch = iCache.read(Integer.toBinaryString(pc.getValue()), 1);
+					}
+					//ins = mem[pc.getValue()];
 				}
-				else{
-					addIns = false;
+				catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Wrong pc calculated after jump");
+					System.exit(0);
 				}
-				//pc.setValue((pc.getValue() + 2));
-				pc.setValue((pc.getValue() + 1));
+				
+				
+				System.err.println(this.timeForFetch+ins);
+				this.timeForFetch--;
+				//pc.setValue((pc.getValue() + 1));
 			}
-			/*counter--;
+			//counter--;
 			System.out.println("cycles: " + cycles);
 			System.out.println("ib: ");
 			printing(ib, 3);
@@ -1049,7 +1065,6 @@ public class TomasuloAlg {
 			System.out.println("beq rs: ");
 			printingA(beqRs, 8);
 			System.out.println();
-*/
 		}
 	}
 
@@ -1098,7 +1113,7 @@ public class TomasuloAlg {
 		return null;
 	}
 
-	/*public void printing(QueueOfArray x, int width){
+	public void printing(QueueOfArray x, int width){
 		for (int i = 0; i< x.size(); i++){
 			for (int j =0; j < width; j++){
 				System.out.print(x.get(i, j) + " ");
@@ -1130,8 +1145,8 @@ public class TomasuloAlg {
 		Register F4 = new Register("F4", 1);
 		Register F8 = new Register("F8", 1);
 		Register F10 = new Register("F10", 1);
-		Register F16 = new Register("F16", 2);
-		Register pc = new Register("pc", 0);
+		Register F16 = new Register("F16", 4);
+		Register pc = new Register("pc", -2);
 		ArrayList<Register> regs = new ArrayList<Register>();
 		regs.add(F6);
 		regs.add(R2);
@@ -1143,8 +1158,20 @@ public class TomasuloAlg {
 		regs.add(F10);
 		regs.add(F16);
 		regs.add(pc);
-		String[] mem = {"sub F8 F2 F6","beq F2 F4 0", "nand F10 F0 F6", "add F6 F8 F2", "null"};
-		t.start(regs, mem, pc);
-	}*/
-
+		Memory memo = new Memory();
+		String[] mem = {"add F16 R2 R3","sub F2 F4 F8", "nand F10 F0 F6", "sub F6 F8 F2"};
+		memo.writeData("0", mem[0]);
+		memo.writeData("2", mem[1]);
+		memo.writeData("4", mem[2]);
+		memo.writeData("6", mem[3]);
+		t.start(regs,new ICache(128, 16, 1, 64, 4, 2, 0, 0,
+				0,  3,  0,
+				 0,  1,
+				 1,  1, 
+				 0, 0,0,0, 2, memo),new Cache(128, 16, 1, 64, 4, 2, 0, 0,
+				0,  3,  0,
+				 0,  10,
+				 1,  1, 
+				 0, 0,0,0, 2, memo), memo, pc);
+	}
 }

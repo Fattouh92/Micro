@@ -206,7 +206,13 @@ static Register pc = new Register("pc", 0);
         			Integer.parseInt(tomasuloSpecifications[8]), 
         			Integer.parseInt(tomasuloSpecifications[9]), 
         			Integer.parseInt(tomasuloSpecifications[10]), 
-        			Integer.parseInt(tomasuloSpecifications[11]));
+        			Integer.parseInt(tomasuloSpecifications[11]),
+        			Integer.parseInt(tomasuloSpecifications[12]),
+        			Integer.parseInt(tomasuloSpecifications[13]),
+        			Integer.parseInt(tomasuloSpecifications[14]),
+        			Integer.parseInt(tomasuloSpecifications[15]),
+        			Integer.parseInt(tomasuloSpecifications[16]),
+        			Integer.parseInt(tomasuloSpecifications[17]));
         	System.out.println("Please enter the start address then write your program in the file.");
         	startAddress = in.nextInt();
                 instructions = assembler.assemble(new File("test.txt"));

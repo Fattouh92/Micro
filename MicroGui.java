@@ -353,7 +353,13 @@ public class MicroGui extends javax.swing.JFrame {
         			Integer.parseInt(tomasuloSpecifications[8]), 
         			Integer.parseInt(tomasuloSpecifications[9]), 
         			Integer.parseInt(tomasuloSpecifications[10]), 
-        			Integer.parseInt(tomasuloSpecifications[11]));
+        			Integer.parseInt(tomasuloSpecifications[11]),
+        			Integer.parseInt(tomasuloSpecifications[12]),
+        			Integer.parseInt(tomasuloSpecifications[13]),
+        			Integer.parseInt(tomasuloSpecifications[14]),
+        			Integer.parseInt(tomasuloSpecifications[15]),
+        			Integer.parseInt(tomasuloSpecifications[16]),
+        			Integer.parseInt(tomasuloSpecifications[17]));
         	System.out.println("Please enter the start address then write your program in the file.");
         	startAddress =Integer.parseInt(st_addr.getText());
                 instructions = assembler.assemble(file);
@@ -363,7 +369,7 @@ public class MicroGui extends javax.swing.JFrame {
                 }
                 for (int q=0; q<= assembler.returnRegisters().size(); q++){
                 	if(!registers.contains(assembler.returnRegisters().get(q))){
-                		Register r = new Register(assembler.returnRegisters().get(q), -1);
+                		Register r = new Register(assembler.returnRegisters().get(q), 0);
                 		registers.add(r);
                 	}
                 }
