@@ -260,10 +260,10 @@ public class TomasuloAlg {
 								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 								String[] entry;
 								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(cache.read(address, 1))};
+									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(cache.read("", 1,this.cycles))};
 								}
 								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(cache.read(address, 1))};
+									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(cache.read("", 1,this.cycles))};
 								}
 								loadRs.add(entry);
 							}
