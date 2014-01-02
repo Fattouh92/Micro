@@ -374,7 +374,7 @@ public class MicroGui extends javax.swing.JFrame {
                 		memory.writeData(memData[d+1], memData[d]);
                 	}
                 }
-                //tomasulo.start(registers, icache, cache, memory, pc);
+                tomasulo.start(registers, icache, cache, memory, pc);
                 textarea.append("the number of cycles is : "+tomasulo.cycles);
                 System.out.println(tomasulo.cycles);
 

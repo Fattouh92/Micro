@@ -226,7 +226,7 @@ static Register pc = new Register("pc", 0);
                 		if(!memData[d].equals("noData"))
                 		memory.writeData(memData[d+1], memData[d]);
                 	}
-                //tomasulo.start(registers, icache, cache, memory, pc);
+                tomasulo.start(registers, icache, cache, memory, pc);
         }
 
         public static void main(String[] args) throws NumberFormatException,
