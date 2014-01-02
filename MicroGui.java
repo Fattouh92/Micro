@@ -380,6 +380,7 @@ public class MicroGui extends JFrame {
                 		memory.writeData(memData[d+1], memData[d]);
                 	}
                 }
+                pc.setValue(pc.getValue()-2);
                 tomasulo.start(registers, icache, cache, memory, pc);
                 textarea.append("the number of cycles is : "+tomasulo.cycles);
                 System.out.println(tomasulo.cycles);
