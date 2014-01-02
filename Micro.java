@@ -206,7 +206,11 @@ static Register pc = new Register("pc", 0);
         			Integer.parseInt(tomasuloSpecifications[8]), 
         			Integer.parseInt(tomasuloSpecifications[9]), 
         			Integer.parseInt(tomasuloSpecifications[10]), 
-        			Integer.parseInt(tomasuloSpecifications[11]));
+        			Integer.parseInt(tomasuloSpecifications[11]),
+        			Integer.parseInt(tomasuloSpecifications[12]),
+        			Integer.parseInt(tomasuloSpecifications[13]),
+        			Integer.parseInt(tomasuloSpecifications[14]),
+        			Integer.parseInt(tomasuloSpecifications[15]));
         	System.out.println("Please enter the start address then write your program in the file.");
         	startAddress = in.nextInt();
                 instructions = assembler.assemble(new File("test.txt"));
@@ -226,7 +230,7 @@ static Register pc = new Register("pc", 0);
                 		if(!memData[d].equals("noData"))
                 		memory.writeData(memData[d+1], memData[d]);
                 	}
-                //tomasulo.start(registers, icache, cache, memory, pc);
+                tomasulo.start(registers, icache, cache, memory, pc);
         }
 
         public static void main(String[] args) throws NumberFormatException,
