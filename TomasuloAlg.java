@@ -547,6 +547,10 @@ public class TomasuloAlg {
 							}
 						}
 						if (storeRs.get(index)[6].equals(Integer.toString(0))){
+							int timeToStore = cache.read(Integer.toBinaryString(Integer.parseInt(storeRs.get(index)[2]) + Integer.parseInt(regsVal[2])), 2, this.cycles);
+							String[] temp = storeRs.get(index);
+							temp[6] = Integer.toString(timeToStore);
+							storeRs.set(index, temp);
 							ib.modify(i, 1, "executed");
 						}
 						else if (storeRs.get(index)[3].equals("") && storeRs.get(index)[4].equals("")){
@@ -857,14 +861,22 @@ public class TomasuloAlg {
 									index = k;
 								}
 							}
-							result = fu.Store(memory, Integer.parseInt(storeRs.get(index)[1]), Integer.parseInt(storeRs.get(index)[2]), Integer.parseInt(regsVal[2]));
-							rob.modify(Integer.parseInt(storeRs.get(index)[5]), 0, Integer.toString(result));
-							rob.modify(Integer.parseInt(storeRs.get(index)[5]), 1, "Y");
-							storeRs.remove(index);
-							ib.modify(i, 1, "written");
+							if (storeRs.get(index)[6].equals("0")){
+								result = fu.Store(memory, Integer.parseInt(storeRs.get(index)[1]), Integer.parseInt(storeRs.get(index)[2]), Integer.parseInt(regsVal[2]));
+								rob.modify(Integer.parseInt(storeRs.get(index)[5]), 0, Integer.toString(result));
+								rob.modify(Integer.parseInt(storeRs.get(index)[5]), 1, "Y");
+								storeRs.remove(index);
+								ib.modify(i, 1, "written");
+							}
+							else{
+								String[] temp = storeRs.get(index);
+								int rem = Integer.parseInt(temp[6]);
+								rem--;
+								temp[6] = Integer.toString(rem);
+							}
 							break;
-							case "add":
-							case "sub":
+						case "add":
+						case "sub":
 								for (int k = 0; k < addSubRs.size(); k++){
 									if (addSubRs.get(k)[5].equals(ib.get(i, 2))){
 										index = k;
