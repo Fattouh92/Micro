@@ -241,6 +241,7 @@ public class Micro {
                     memory.writeData(Integer.toBinaryString(startAddress),
                                     instructions[i]);
                     startAddress += 2;
+                    System.err.println("ERROR"+Integer.toBinaryString(startAddress)+instructions[i]);
             }
             for (int q = 0; q < assembler.returnRegisters().size(); q++) {
                     if (!registers.contains(assembler.returnRegisters().get(q))) {

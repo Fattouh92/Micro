@@ -79,7 +79,7 @@ public class TomasuloAlg {
 		while (!(ins.equals("null") && rob.isEmpty())){
 		//while (counter > 0){
 			cycles++;
-
+			System.err.println("PCCCCCCCCC" + pc.value);
 			
 
 			if (!rob.isEmpty()){

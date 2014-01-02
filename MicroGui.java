@@ -364,7 +364,7 @@ public class MicroGui extends JFrame {
         	startAddress =Integer.parseInt(st_addr.getText());
                 instructions = assembler.assemble(file);
                 for(int i=0; i<instructions.length; i++){
-                	memory.writeData(Integer.toBinaryString(startAddress),instructions[i]);
+                	memory.writeData(Integer.toString(startAddress),instructions[i]);
                 	startAddress+=2;
                 }
                 for (int q=0; q< assembler.returnRegisters().size(); q++){
@@ -383,15 +383,21 @@ public class MicroGui extends JFrame {
                 tomasulo.start(registers, icache, cache, memory, pc);
                 textarea.append("the number of cycles is : "+tomasulo.cycles);
                 System.out.println(tomasulo.cycles);
-                
-                System.out.println("IPC: " + (instructions.length / tomasulo.cycles));
-                textarea.append("IPC : "+(instructions.length / tomasulo.cycles));
+                double ipc = 1.00*(instructions.length / tomasulo.cycles);
+                System.out.println("IPC: " + ipc);
+                textarea.append("IPC : "+ipc);
+                double perc;
                    switch (cacheLevels) {
                    case 1:
+                	   try {
+                		   perc = 100.00*(cache.hit / (cache.hit + cache.miss));
                     System.out.println("Cache Hit ratio: "
-                         + (cache.hit / (cache.hit + cache.miss)));
-                    textarea.append("Cache Hit ratio:  "+(cache.hit / (cache.hit + cache.miss)));
-                     break;
+                         + perc);
+                    textarea.append("Cache Hit ratio:  "+perc);
+                	   } catch (ArithmeticException e) {
+                		   textarea.append("Cache Hit ratio: 0%");
+                	   }
+                    break;
                    case 2:
                 	   textarea.append("Cache Hit ratio :");
                 	   textarea.append("Level 1 : "+(cache.hit / (cache.hit + cache.miss)));
