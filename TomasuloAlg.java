@@ -269,7 +269,7 @@ public class TomasuloAlg {
 									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(cache.read(Integer.toBinaryString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2])), 1,this.cycles)), Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]))};
 								}
 								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(cache.read(, 1,this.cycles)), Integer.toString(regTable[getRegIndex(regs, regsVal[1])])};
+									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(cache.read("", 1,this.cycles)), Integer.toString(regTable[getRegIndex(regs, regsVal[1])])};
 								}
 								loadRs.add(entry);
 							}
@@ -1077,17 +1077,17 @@ public class TomasuloAlg {
 			printingA(beqRs, 8);
 			System.out.println();
 		}
-		int time = 0;
-		for (int i = 0; i<cache.times.size(); i++) {
-			if (this.cache.times.get(i) < time) {
-				time+= (this.cache.times.get(i)+this.cache.cycles_access_memory);
-			} else {
-				time = (this.cache.times.get(i)+this.cache.cycles_access_memory);
-			}
-		}
-		if (time > cycles) {
-			cycles= time;
-		}
+//		int time = 0;
+//		for (int i = 0; i<cache.times.size(); i++) {
+//			if (this.cache.times.get(i) < time) {
+//				time+= (this.cache.times.get(i)+this.cache.cycles_access_memory);
+//			} else {
+//				time = (this.cache.times.get(i)+this.cache.cycles_access_memory);
+//			}
+//		}
+//		if (time > cycles) {
+//			cycles= time;
+//		}
 	}
 
 	public String checkOp(String ins){
@@ -1160,7 +1160,7 @@ public class TomasuloAlg {
 	public static void main(String [] args){
 		TomasuloAlg t = new TomasuloAlg(8, 5, 2, 2, 2, 2, 1, 2, 8, 8, 2, 12, 6, 2, 2, 2, 2);
 		Register F6 = new Register("F6", 1);
-		Register R2 = new Register("R2", 1);
+		Register R2 = new Register("R2", 5);
 		Register F2 = new Register("F2", 1);
 		Register R3 = new Register("R3", 1);
 		Register F0 = new Register("F0", 1);
@@ -1181,7 +1181,7 @@ public class TomasuloAlg {
 		regs.add(F16);
 		regs.add(pc);
 		Memory memo = new Memory();
-		String[] mem = {"add F16 R2 R3","sub F2 F4 F8", "nand F10 F0 F6", "sub F6 F8 F2"};
+		String[] mem = {"sub F6 R2 R3","beq F6 F16 2", "nand R3 F0 F6", "sub F6 F8 F2"};
 		memo.writeData("0", mem[0]);
 		memo.writeData("2", mem[1]);
 		memo.writeData("4", mem[2]);
