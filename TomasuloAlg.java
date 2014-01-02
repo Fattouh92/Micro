@@ -268,6 +268,9 @@ public class TomasuloAlg {
 								int regIndex = getRegIndex(regs, regsVal[0]);
 								regTable[regIndex] = rob.nItems - 1;
 								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+								if (regsVal[1].equals(regsVal[0])){
+									valid = true;
+								}
 								String[] entry;
 								if (valid){
 
@@ -315,6 +318,12 @@ public class TomasuloAlg {
 						        	regTable[regIndex] = rob.nItems - 1;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
+						        	if (regsVal[1].equals(regsVal[0])){
+										valid = true;
+									}
+						        	if (regsVal[2].equals(regsVal[0])){
+										valid2 = true;
+									}
 						        	String[] entry;
 						        	if (valid && valid2){
 						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(addSubCyc)};
@@ -341,6 +350,12 @@ public class TomasuloAlg {
 						        	regTable[regIndex] = rob.nItems - 1;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
+						        	if (regsVal[1].equals(regsVal[0])){
+										valid = true;
+									}
+						        	if (regsVal[2].equals(regsVal[0])){
+										valid2 = true;
+									}
 						        	String[] entry;
 						        	if (valid && valid2){
 						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(nandCyc)};
@@ -367,6 +382,12 @@ public class TomasuloAlg {
 						        	regTable[regIndex] = rob.nItems - 1;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 						        	boolean valid2 = this.freeDest(regs, regTable, regsVal[2]);
+						        	if (regsVal[1].equals(regsVal[0])){
+										valid = true;
+									}
+						        	if (regsVal[2].equals(regsVal[0])){
+										valid2 = true;
+									}
 						        	String[] entry;
 						        	if (valid && valid2){
 						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(getRegOrg(regs, regsVal[2]).getValue()), "", "", Integer.toString(rob.nItems - 1), Integer.toString(multCyc)};
@@ -392,6 +413,9 @@ public class TomasuloAlg {
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
 						        	regTable[regIndex] = rob.nItems - 1;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	if (regsVal[1].equals(regsVal[0])){
+										valid = true;
+									}
 						        	String[] entry;
 						        	if (valid){
 						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(addiCyc)};
@@ -455,6 +479,9 @@ public class TomasuloAlg {
 						        	int regIndex = getRegIndex(regs, regsVal[0]);
 						        	regTable[regIndex] = rob.nItems - 1;
 						        	boolean valid = this.freeDest(regs, regTable, regsVal[1]);
+						        	if (regsVal[1].equals(regsVal[0])){
+										valid = true;
+									}
 						        	String[] entry;
 						        	if (valid){
 						        		entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), Integer.toString(pc.getValue()),  "", Integer.toString(rob.nItems - 1), Integer.toString(jmpJalrRetCyc)};
@@ -547,6 +574,10 @@ public class TomasuloAlg {
 							}
 						}
 						if (storeRs.get(index)[6].equals(Integer.toString(0))){
+							int timeToStore = cache.read(Integer.toBinaryString(Integer.parseInt(storeRs.get(index)[2]) + Integer.parseInt(regsVal[2])), 2, this.cycles);
+							String[] temp = storeRs.get(index);
+							temp[6] = Integer.toString(timeToStore);
+							storeRs.set(index, temp);
 							ib.modify(i, 1, "executed");
 						}
 						else if (storeRs.get(index)[3].equals("") && storeRs.get(index)[4].equals("")){
@@ -857,14 +888,22 @@ public class TomasuloAlg {
 									index = k;
 								}
 							}
-							result = fu.Store(memory, Integer.parseInt(storeRs.get(index)[1]), Integer.parseInt(storeRs.get(index)[2]), Integer.parseInt(regsVal[2]));
-							rob.modify(Integer.parseInt(storeRs.get(index)[5]), 0, Integer.toString(result));
-							rob.modify(Integer.parseInt(storeRs.get(index)[5]), 1, "Y");
-							storeRs.remove(index);
-							ib.modify(i, 1, "written");
+							if (storeRs.get(index)[6].equals("0")){
+								result = fu.Store(memory, Integer.parseInt(storeRs.get(index)[1]), Integer.parseInt(storeRs.get(index)[2]), Integer.parseInt(regsVal[2]));
+								rob.modify(Integer.parseInt(storeRs.get(index)[5]), 0, Integer.toString(result));
+								rob.modify(Integer.parseInt(storeRs.get(index)[5]), 1, "Y");
+								storeRs.remove(index);
+								ib.modify(i, 1, "written");
+							}
+							else{
+								String[] temp = storeRs.get(index);
+								int rem = Integer.parseInt(temp[6]);
+								rem--;
+								temp[6] = Integer.toString(rem);
+							}
 							break;
-							case "add":
-							case "sub":
+						case "add":
+						case "sub":
 								for (int k = 0; k < addSubRs.size(); k++){
 									if (addSubRs.get(k)[5].equals(ib.get(i, 2))){
 										index = k;
