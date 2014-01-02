@@ -199,17 +199,22 @@ public class Micro {
             System.out
                             .println("Please Enter your specifications for the hardware organization in the following format: "
                                             + "instruction buffer size, "
-                                            + "number of load/store reservation stations,"
+                                            + "number of load reservation stations"
+                                            + "number of store reservation stations,"
                                             + "number of add/sub reservation stations,"
                                             + "number of nand reservation stations,"
                                             + "number of mul reservation stations,"
                                             + "number of addi reservation stations,"
+                                            + "number of jmp/jal/ret reservation stations,"
+                                            + "number of beq reservation stations,"
                                             + "number of ROB entries,"
-                                            + "load/store cycles,"
+                                            + "store cycles,"
                                             + "add/sub cycles,"
                                             + "nand cycles,"
                                             + "mul cycles,"
-                                            + "addi cycles");
+                                            + "addi cycles,"
+                                            + "jmp/jal/ret cycles,"
+                                            + "beq cycles");
             String[] tomasuloSpecifications = in.next().split(",");
             tomasulo = new TomasuloAlg(Integer.parseInt(tomasuloSpecifications[0]),
                             Integer.parseInt(tomasuloSpecifications[1]),
