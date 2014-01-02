@@ -80,6 +80,23 @@ public class TomasuloAlg {
 		//while (counter > 0){
 			cycles++;
 
+			
+
+			if (!rob.isEmpty()){
+				if (rob.peek()[1].equals("Y")){
+					if (rob.peek()[3].equals("O")){
+						fu.CommitOP(Integer.parseInt(rob.peek()[0]), getRegOrg(regs, rob.peek()[2]));
+					}
+					else if (rob.peek()[3].equals("S")){
+						String[] split =  rob.peek()[2].split(" ");
+						String address = split[0];
+						String offset = split[1];
+						fu.CommitStore(memory, Integer.parseInt(rob.peek()[0]), getRegOrg(regs, address), Integer.parseInt(offset));
+					}
+					ib.modify(0, 1, "commited");
+				}
+			}
+			
 			if (!ib.isEmpty()){
 				if(ib.peek()[1].equals("commited")){
 					rob.dequeue();
@@ -227,21 +244,7 @@ public class TomasuloAlg {
 					}
 				}
 			}
-
-			if (!rob.isEmpty()){
-				if (rob.peek()[1].equals("Y")){
-					if (rob.peek()[3].equals("O")){
-						fu.CommitOP(Integer.parseInt(rob.peek()[0]), getRegOrg(regs, rob.peek()[2]));
-					}
-					else if (rob.peek()[3].equals("S")){
-						String[] split =  rob.peek()[2].split(" ");
-						String address = split[0];
-						String offset = split[1];
-						fu.CommitStore(memory, Integer.parseInt(rob.peek()[0]), getRegOrg(regs, address), Integer.parseInt(offset));
-					}
-					ib.modify(0, 1, "commited");
-				}
-			}
+			
 			for (int i = 0; i < ib.size(); i++){
 				iBreak = false;
 				if (ib.get(i,1).equals("")){
@@ -262,10 +265,10 @@ public class TomasuloAlg {
 								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 								String[] entry;
 								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(loadCyc)};
+									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(loadCyc), Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]))};
 								}
 								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(loadCyc)};
+									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(loadCyc), Integer.toString(regTable[getRegIndex(regs, regsVal[1])])};
 								}
 								loadRs.add(entry);
 							}
@@ -278,12 +281,19 @@ public class TomasuloAlg {
 								rob.enqueue(robRec);
 								ib.modify(i, 2, Integer.toString(rob.nItems - 1));
 								boolean valid = this.freeDest(regs, regTable, regsVal[0]);
+								boolean valid2 = this.freeDest(regs, regTable, regsVal[1]);
 								String[] entry;
 								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(storeCyc)};
+									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[0]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(storeCyc), ""};
 								}
 								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(rob.nItems - 1), Integer.toString(storeCyc)};
+									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[0])]), Integer.toString(rob.nItems - 1), Integer.toString(storeCyc), ""};
+								}
+								if (valid2){
+									entry[5] = Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]));
+								}
+								else{
+									entry[5] = Integer.toString(regTable[getRegIndex(regs, regsVal[1])]);
 								}
 								storeRs.add(entry);
 							}
