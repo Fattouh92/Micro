@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 public class TomasuloAlg {
+	Cache cache;
 	QueueOfArray ib;
 	QueueOfArray rob;
 	ArrayList<String[]> loadRs;
@@ -20,7 +21,6 @@ public class TomasuloAlg {
 	ArrayList<String[]> beqRs;
 	int timeForFetch;
 	int beqRsSize;
-	int loadCyc;
 	int storeCyc;
 	int addSubCyc;
 	int nandCyc;
@@ -31,7 +31,7 @@ public class TomasuloAlg {
 	int cycles;
 	boolean canWrite;
 	boolean iBreak;
-	public TomasuloAlg(int ibSize, int loadRsSize, int storeRsSize, int addSubRsSize, int nandRsSize, int multRsSize, int addiRsSize, int jmpJalrRetRsSize, int beqRsSize, int robSize, int loadCyc, int storeCyc, int addSubCyc, int nandCyc, int multCyc, int addiCyc, int jmpJalrRetCyc, int beqCyc){
+	public TomasuloAlg(int ibSize, int loadRsSize, int storeRsSize, int addSubRsSize, int nandRsSize, int multRsSize, int addiRsSize, int jmpJalrRetRsSize, int beqRsSize, int robSize, int storeCyc, int addSubCyc, int nandCyc, int multCyc, int addiCyc, int jmpJalrRetCyc, int beqCyc){
 		ib = new QueueOfArray(ibSize,3);
 		rob = new QueueOfArray(robSize,4);
 		loadRs = new ArrayList<String[]>();
@@ -50,7 +50,6 @@ public class TomasuloAlg {
 		this.jmpJalrRetRsSize = jmpJalrRetRsSize;
 		beqRs = new ArrayList<String[]>();
 		this.beqRsSize = beqRsSize;
-		this.loadCyc = loadCyc;
 		this.storeCyc = storeCyc;
 		this.addSubCyc = addSubCyc;
 		this.nandCyc = nandCyc;
@@ -66,6 +65,7 @@ public class TomasuloAlg {
 	//public void start(ArrayList<Register> regs, String[] mem, Register pc){
 		//Units fu = new Units(cache);
 		Units fu = new Units();
+		this.cache = cache;
 		//Memory memory = new Memory();
 		int[] regTable = new int[regs.size()];
 		for (int tempCounter=0; tempCounter < regTable.length; tempCounter++) {
@@ -270,10 +270,11 @@ public class TomasuloAlg {
 								boolean valid = this.freeDest(regs, regTable, regsVal[1]);
 								String[] entry;
 								if (valid){
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(loadCyc), Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]))};
+
+									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(cache.read(Integer.toBinaryString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2])), 1,this.cycles)), Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]))};
 								}
 								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(loadCyc), regsVal[2]};
+									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), "", regsVal[2]};
 								}
 								loadRs.add(entry);
 							}
@@ -533,6 +534,7 @@ public class TomasuloAlg {
 								String[] temp = loadRs.get(index);
 								temp[1] = Integer.toString(getRegOrg(regs, rob.get(Integer.parseInt(loadRs.get(index)[2]), 2)).getValue());
 								temp[5] = Integer.toString(getRegOrg(regs, rob.get(Integer.parseInt(loadRs.get(index)[2]), 2)).getValue() + Integer.parseInt(temp[5]));
+								temp[4] = Integer.toString(cache.read(temp[5], 1,this.cycles));
 								temp[2] = "";
 								loadRs.set(index, temp);
 							}
@@ -1111,6 +1113,17 @@ public class TomasuloAlg {
 			printingA(beqRs, 8);
 			System.out.println();
 		}
+//		int time = 0;
+//		for (int i = 0; i<cache.times.size(); i++) {
+//			if (this.cache.times.get(i) < time) {
+//				time+= (this.cache.times.get(i)+this.cache.cycles_access_memory);
+//			} else {
+//				time = (this.cache.times.get(i)+this.cache.cycles_access_memory);
+//			}
+//		}
+//		if (time > cycles) {
+//			cycles= time;
+//		}
 	}
 
 	public String checkOp(String ins){
@@ -1181,9 +1194,9 @@ public class TomasuloAlg {
 		System.out.println();
 	}
 	public static void main(String [] args){
-		TomasuloAlg t = new TomasuloAlg(8, 5, 2, 2, 2, 2, 1, 2, 8, 8, 2, 12, 6, 2, 2, 2, 2, 2);
+		TomasuloAlg t = new TomasuloAlg(8, 5, 2, 2, 2, 2, 1, 2, 8, 8, 2, 12, 6, 2, 2, 2, 2);
 		Register F6 = new Register("F6", 1);
-		Register R2 = new Register("R2", 1);
+		Register R2 = new Register("R2", 5);
 		Register F2 = new Register("F2", 1);
 		Register R3 = new Register("R3", 1);
 		Register F0 = new Register("F0", 1);
