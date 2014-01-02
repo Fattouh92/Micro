@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class TomasuloAlg {
 	Cache cache;
+	boolean flushFetch = false;
 	QueueOfArray ib;
 	QueueOfArray rob;
 	ArrayList<String[]> loadRs;
@@ -75,9 +76,9 @@ public class TomasuloAlg {
 		//iCache.read(Integer.toBinaryString(pc.getValue()));
 		String ins = "";
 		boolean addIns = true;
-		//int counter = 30;
-		while (!(ins.equals("null") && rob.isEmpty())){
-		//while (counter > 0){
+		int counter = 100;
+		//while (!(ins.equals("null") && rob.isEmpty())){
+		while (counter > 0){
 			cycles++;
 			System.err.println("PCCCCCCCCC" + pc.value);
 			
@@ -989,6 +990,7 @@ public class TomasuloAlg {
 							int pc3 = pc.getValue();
 							result = fu.BEQ(pc, Integer.parseInt(beqRs.get(index)[3]), Integer.parseInt(beqRs.get(index)[1]), Integer.parseInt(beqRs.get(index)[2]), Integer.parseInt(regsVal[2]));
 							if (result != pc3){
+								flushFetch = true;
 								for(int a = 0; a < loadRs.size(); a++){
 									if(Integer.parseInt(loadRs.get(a)[3]) > bindex){
 										loadRs.remove(a);
@@ -1043,6 +1045,8 @@ public class TomasuloAlg {
 								for (int d = bindex + 1; d <= rob.size(); d++){
 									rob.nItems--;
 								}
+
+								iBreak = true;
 							}
 							rob.modify(Integer.parseInt(beqRs.get(index)[6]), 0, Integer.toString(result));
 							rob.modify(Integer.parseInt(beqRs.get(index)[6]), 1, "Y");
@@ -1052,8 +1056,6 @@ public class TomasuloAlg {
 							beqRs.remove(index);
 							ib.modify(i, 1, "written");
 							canWrite = true;
-							addIns = true;
-							iBreak = true;
 							break;
 						case "jalr":
 							for (int k = 0; k < jmpJalrRetRs.size(); k++){
@@ -1103,16 +1105,23 @@ public class TomasuloAlg {
 				//ins = memory.readData(Integer.toBinaryString(pc.getValue()));
 				//iCache.read(Integer.toBinaryString(pc.getValue()));
 				try {
+					if (flushFetch == true) {
+						timeForFetch = 0;
+					}
 					if (timeForFetch == 0) {
 						if (!ins.equals("null")){
 							if (ins.length() != 0) {
-								String[] insa = {ins, "", ""};
-								ib.enqueue(insa);
+								if (!flushFetch) {
+									String[] insa = {ins, "", ""};
+									ib.enqueue(insa);
+								}
+								
 							}
 						}
 						else {
 							addIns = false;
 						}
+						flushFetch = false;
 						pc.setValue((pc.getValue() + 2));
 						ins = memory.readData(pc.getValue()+"");
 						//System.out.println(pc.getValue()+"");
@@ -1130,7 +1139,7 @@ public class TomasuloAlg {
 				this.timeForFetch--;
 				//pc.setValue((pc.getValue() + 1));
 			}
-			//counter--;
+			counter--;
 			System.out.println("cycles: " + cycles);
 			System.out.println("ib: ");
 			printing(ib, 3);
@@ -1152,17 +1161,17 @@ public class TomasuloAlg {
 			printingA(beqRs, 8);
 			System.out.println();
 		}
-//		int time = 0;
-//		for (int i = 0; i<cache.times.size(); i++) {
-//			if (this.cache.times.get(i) < time) {
-//				time+= (this.cache.times.get(i)+this.cache.cycles_access_memory);
-//			} else {
-//				time = (this.cache.times.get(i)+this.cache.cycles_access_memory);
-//			}
-//		}
-//		if (time > cycles) {
-//			cycles= time;
-//		}
+		int time = 0;
+		for (int i = 0; i<cache.times.size(); i++) {
+			if (this.cache.times.get(i) < time) {
+				time+= (this.cache.times.get(i)+this.cache.cycles_access_memory);
+			} else {
+				time = (this.cache.times.get(i)+this.cache.cycles_access_memory);
+			}
+		}
+		if (time > cycles) {
+			cycles= time;
+		}
 	}
 
 	public String checkOp(String ins){
@@ -1233,7 +1242,7 @@ public class TomasuloAlg {
 		System.out.println();
 	}
 	public static void main(String [] args){
-		TomasuloAlg t = new TomasuloAlg(8, 5, 2, 2, 2, 2, 1, 2, 8, 8, 2, 12, 6, 2, 2, 2, 2);
+		TomasuloAlg t = new TomasuloAlg(8, 1, 2, 2, 2, 2, 1, 2, 8, 8, 2, 2, 1, 2, 2, 2, 5);
 		Register F6 = new Register("F6", 1);
 		Register R2 = new Register("R2", 5);
 		Register F2 = new Register("F2", 1);
@@ -1242,7 +1251,7 @@ public class TomasuloAlg {
 		Register F4 = new Register("F4", 1);
 		Register F8 = new Register("F8", 1);
 		Register F10 = new Register("F10", 1);
-		Register F16 = new Register("F16", 4);
+		Register F16 = new Register("F16", 0);
 		Register pc = new Register("pc", -2);
 		ArrayList<Register> regs = new ArrayList<Register>();
 		regs.add(F6);
@@ -1256,11 +1265,11 @@ public class TomasuloAlg {
 		regs.add(F16);
 		regs.add(pc);
 		Memory memo = new Memory();
-		String[] mem = {"store F16 R2 4","load F2 R2 4"};
+		String[] mem = {"sub R2 R2 R3","beq R2 F0 2", "ret F16", "nand R2 R2 R3"};
 		memo.writeData("0", mem[0]);
 		memo.writeData("2", mem[1]);
-		//memo.writeData("4", mem[2]);
-		//memo.writeData("6", mem[3]);
+		memo.writeData("4", mem[2]);
+		memo.writeData("6", mem[3]);
 		t.start(regs,new ICache(128, 16, 1, 64, 4, 2, 0, 0,
 				0,  3,  0,
 				 0,  1,

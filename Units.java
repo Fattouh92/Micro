@@ -61,26 +61,26 @@ public class Units {
 
 	public int BEQ(Register pc, int pc2, int a, int b, int immediate) {
 		if (a == b) {
-			int address = pc2 + immediate;
+			int address = pc2 + immediate -2;
 			pc.setValue(address);
 		}
 		return pc.getValue();
 	}
 
 	public int jump(Register pc, int pc2, int a, int immediate) {
-		int address = pc2 + a + immediate;
+		int address = pc2 + a + immediate -2;
 		pc.setValue(address);
 		return address;
 	}
 
 	public int Jalr(Register pc, int pc2, Register a, int b) {
-		a.setValue(pc2);
-		pc.setValue(b);
+		a.setValue(pc2-2);
+		pc.setValue(b-2);
 		return a.getValue();
 	}
 
 	public int Return(int a, Register pc) {
-		pc.setValue(a);
+		pc.setValue(a-2);
 		return a;
 	}
 
