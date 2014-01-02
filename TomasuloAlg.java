@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 public class TomasuloAlg {
+	Cache cache;
 	QueueOfArray ib;
 	QueueOfArray rob;
 	ArrayList<String[]> loadRs;
@@ -64,6 +65,7 @@ public class TomasuloAlg {
 	//public void start(ArrayList<Register> regs, String[] mem, Register pc){
 		//Units fu = new Units(cache);
 		Units fu = new Units();
+		this.cache = cache;
 		//Memory memory = new Memory();
 		int[] regTable = new int[regs.size()];
 		for (int tempCounter=0; tempCounter < regTable.length; tempCounter++) {
@@ -264,10 +266,10 @@ public class TomasuloAlg {
 								String[] entry;
 								if (valid){
 
-									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(cache.read("", 1,this.cycles)), Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]))};
+									entry = new String[]{"Y", Integer.toString(getRegOrg(regs, regsVal[1]).getValue()), "", Integer.toString(rob.nItems - 1), Integer.toString(cache.read(Integer.toBinaryString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2])), 1,this.cycles)), Integer.toString(getRegOrg(regs, regsVal[1]).getValue() + Integer.parseInt(regsVal[2]))};
 								}
 								else{
-									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(cache.read("", 1,this.cycles)), Integer.toString(regTable[getRegIndex(regs, regsVal[1])])};
+									entry = new String[]{"Y", "", Integer.toString(regTable[getRegIndex(regs, regsVal[1])]), Integer.toString(rob.nItems - 1), Integer.toString(cache.read(, 1,this.cycles)), Integer.toString(regTable[getRegIndex(regs, regsVal[1])])};
 								}
 								loadRs.add(entry);
 							}
@@ -1074,6 +1076,17 @@ public class TomasuloAlg {
 			System.out.println("beq rs: ");
 			printingA(beqRs, 8);
 			System.out.println();
+		}
+		int time = 0;
+		for (int i = 0; i<cache.times.size(); i++) {
+			if (this.cache.times.get(i) < time) {
+				time+= (this.cache.times.get(i)+this.cache.cycles_access_memory);
+			} else {
+				time = (this.cache.times.get(i)+this.cache.cycles_access_memory);
+			}
+		}
+		if (time > cycles) {
+			cycles= time;
 		}
 	}
 
