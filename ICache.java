@@ -307,10 +307,10 @@ public class ICache {
 				 0,  10,
 				 1,  1, 
 				 0, 0,0,0, 2, new Memory());
-		System.out.println("time" + c.read("10000110", 1));
-		System.out.println("time" + c.read("10000110", 1));
-		c.read("10000110", 2);
-		c.read("11010100", 1);
+		//System.out.println("time" + c.read("10000110", 1));
+		//System.out.println("time" + c.read("10000110", 1));
+		//c.read("10000110", 2);
+		//c.read("11010100", 1);
 		//c.read("10", 1);
 		//c.read("", 1);
 	}

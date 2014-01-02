@@ -358,8 +358,7 @@ public class MicroGui extends javax.swing.JFrame {
         			Integer.parseInt(tomasuloSpecifications[13]),
         			Integer.parseInt(tomasuloSpecifications[14]),
         			Integer.parseInt(tomasuloSpecifications[15]),
-        			Integer.parseInt(tomasuloSpecifications[16]),
-        			Integer.parseInt(tomasuloSpecifications[17]));
+        			Integer.parseInt(tomasuloSpecifications[16]));
         	System.out.println("Please enter the start address then write your program in the file.");
         	startAddress =Integer.parseInt(st_addr.getText());
                 instructions = assembler.assemble(file);

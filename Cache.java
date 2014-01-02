@@ -42,6 +42,7 @@ public class Cache {
 	ArrayList<ActualCache> LevelOne = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelTwo = new ArrayList<ActualCache>();
 	ArrayList<ActualCache> LevelThree = new ArrayList<ActualCache>();
+	ArrayList<Integer> times = new ArrayList<Integer>();
 	Memory memory;
 //m cannot be zero
 	public Cache(int s, int l, int m, int s2, int l2, int m2, int s3, int l3,
@@ -96,7 +97,7 @@ public class Cache {
 		this.memory = memory;
 	}
 
-	public int read (String address, int type) {  //type=1 read or 2 = write
+	public int read (String address, int type, int time) {  //type=1 read or 2 = write
 		int cycles = 0;
 		cycles += this.cycles_access_data;
 
@@ -119,6 +120,7 @@ public class Cache {
 			if(type == 2 && write_hit_policy == 1) {
 				//queue
 				this.memory_accesses ++;
+				this.times.add(time);
 			}
 			if(type == 2 && write_hit_policy == 2) {
 				//System.out.println("here");
@@ -127,7 +129,7 @@ public class Cache {
 		} else {
 			miss++;
 			if (levels >= 2) {
-				cycles += this.readLevelTwo(address, type);
+				cycles += this.readLevelTwo(address, type, time);
 				if (type != 2 || write_miss_policy != 2) {
 					if (tempTags.contains(null)) {
 						LevelOne.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
@@ -142,6 +144,7 @@ public class Cache {
 						if (LevelOne.get(random).getArray()[indexInt][3].equals("Y")) {
 							//queue
 							this.memory_accesses++;
+							this.times.add(time);
 						}
 						LevelOne.get(random).getArray()[indexInt][3] = "N";
 					}
@@ -164,6 +167,7 @@ public class Cache {
 							//System.out.println("here2");
 							//queue
 							this.memory_accesses++;
+							this.times.add(time);
 						}
 						LevelOne.get(random).getArray()[indexInt][3] = "N";
 					}
@@ -176,7 +180,7 @@ public class Cache {
 		return cycles;
 	}
 
-	public int readLevelTwo (String address, int type) {
+	public int readLevelTwo (String address, int type, int time) {
 		int cycles2 = 0;
 		cycles2 += this.cycles_access_data2;
 		while(address.length() < 16) {
@@ -198,6 +202,7 @@ public class Cache {
 			if(type == 2 && write_hit_policy2 == 1) {
 				//queue
 				this.memory_accesses ++;
+				this.times.add(time);
 			}
 			if(type == 2 && write_hit_policy2 == 2) {
 				LevelTwo.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
@@ -206,7 +211,7 @@ public class Cache {
 			miss2++;
 
 			if (levels == 3) {
-				cycles2 += this.readLevelThree(address, type);
+				cycles2 += this.readLevelThree(address, type, time);
 				if (type != 2 || write_miss_policy2 != 2) {
 					if (tempTags.contains(null)) {
 						LevelTwo.get(tempTags.indexOf(null)).getArray()[indexInt][0] = tempTag;
@@ -221,6 +226,7 @@ public class Cache {
 						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
 							//queue
 							this.memory_accesses++;
+							this.times.add(time);
 						}
 						LevelTwo.get(random).getArray()[indexInt][3] = "N";
 					}
@@ -241,6 +247,7 @@ public class Cache {
 						if (LevelTwo.get(random).getArray()[indexInt][3].equals("Y")) {
 							//queue
 							this.memory_accesses++;
+							this.times.add(time);
 						}
 						LevelTwo.get(random).getArray()[indexInt][3] = "N";
 					}
@@ -251,7 +258,7 @@ public class Cache {
 		return cycles2;
 	}
 
-	public int readLevelThree(String address, int type) {
+	public int readLevelThree(String address, int type, int time) {
 		int cycles3 = 0;
 		cycles3 += this.cycles_access_data3;
 		while(address.length() < 16) {
@@ -273,6 +280,7 @@ public class Cache {
 			if(type == 2 && write_hit_policy3 == 1) {
 				//queue
 				this.memory_accesses ++;
+				this.times.add(time);
 			}
 			if(type == 2 && write_hit_policy3 == 2) {
 				LevelThree.get(tempTags.indexOf(tempTag)).getArray()[indexInt][3] = "Y";
@@ -294,6 +302,7 @@ public class Cache {
 					if (LevelThree.get(random).getArray()[indexInt][3].equals("Y")) {
 						//queue
 						this.memory_accesses++;
+						this.times.add(time);
 					}
 					LevelThree.get(random).getArray()[indexInt][3] = "N";
 				}
@@ -307,10 +316,10 @@ public class Cache {
 				 0,  10,
 				 1,  1, 
 				 0, 0,0,0, 2, new Memory());
-		System.out.println("time" + c.read("10000110", 1));
-		System.out.println("time" + c.read("10000110", 1));
-		c.read("10000110", 2);
-		c.read("11010100", 1);
+		System.out.println("time" + c.read("10000110", 1, 0));
+		System.out.println("time" + c.read("10000110", 1, 0));
+		c.read("10000110", 2, 0);
+		c.read("11010100", 1, 0);
 		//c.read("10", 1);
 		//c.read("", 1);
 	}
